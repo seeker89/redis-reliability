@@ -90,6 +90,7 @@ In this model, there are multiple `master` nodes, each followed by a number of `
 
 **Note**: this still uses the same asynchronous replication, and still doesn't guarantee strong consistency.
 
+[Learn more here](https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/).
 
 ## Redis persistence
 

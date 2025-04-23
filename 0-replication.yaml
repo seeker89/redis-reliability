@@ -1,0 +1,9 @@
+architecture: replication
+# minimal cluster
+master:
+    replicaCount: 1
+replica:
+    replicaCount: 2
+# very insecure
+auth:
+  enabled: false

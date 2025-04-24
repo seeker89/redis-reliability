@@ -491,5 +491,44 @@ Cool, so now we have everything we need to test out that consistency.
 
 Our little adventure so far might give you a false sense of security. Let's rain on that parade!
 
+To show the stale reads from replicas, we're going to simulate 100 clients, each making a 1000 operations.
 
+We'll start `writer` goroutines which will write to a key, and corresponding `reader` goroutines that will read it as soon as the writer got acknoledgement, and compare the values.
+
+My choice of Go to write the examples should now become clearer.
+
+[cmd/async-replication](./cmd/async-replication/main.go) is where the code lives. All 90ish lines of it.
+
+
+```sh
+go run cmd/async-replication/main.go
+```
+
+You should see an output similar to this one, with random order:
+
+
+```sh
+...
+Wrong value: client_87 got: 826 expected: 827
+Wrong value: client_80 got: 802 expected: 803
+Wrong value: client_81 got: 799 expected: 800
+Done: client_97 total_reads: 1000 stale_reads: 3 error_rate: 0.003
+Done: client_70 total_reads: 1000 stale_reads: 1 error_rate: 0.001
+Done: client_67 total_reads: 1000 stale_reads: 0 error_rate: 0
+Done: client_92 total_reads: 1000 stale_reads: 1 error_rate: 0.001
+Done: client_22 total_reads: 1000 stale_reads: 4 error_rate: 0.004
+Done: client_65 total_reads: 1000 stale_reads: 1 error_rate: 0.001
+Done: client_99 total_reads: 1000 stale_reads: 2 error_rate: 0.002
+Done: client_24 total_reads: 1000 stale_reads: 3 error_rate: 0.003
+Done: client_54 total_reads: 1000 stale_reads: 3 error_rate: 0.003
+Done: client_82 total_reads: 1000 stale_reads: 2 error_rate: 0.002
+Done: client_55 total_reads: 1000 stale_reads: 2 error_rate: 0.002
+Done: client_73 total_reads: 1000 stale_reads: 3 error_rate: 0.003
+Done: client_56 total_reads: 1000 stale_reads: 2 error_rate: 0.002
+Done: client_96 total_reads: 1000 stale_reads: 2 error_rate: 0.002
+Done: client_71 total_reads: 1000 stale_reads: 3 error_rate: 0.003
+Done: client_86 total_reads: 1000 stale_reads: 2 error_rate: 0.002
+...
+100 clients all done
+```
 

@@ -802,6 +802,11 @@ The `sentinel` instance logged this:
 │ 1:X 25 Apr 2025 20:50:15.103 * Sentinel new configuration saved on disk
 ```
 
+***Note**: the key message here was `+switch-master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379`.
+This is probably what you're going to look for in logs while debugging.
+
+[Learn more here](https://cndoc.github.io/redis-doc-cn/cn/topics/sentinel.html).
+
 ***Note***: there wasn't a real election for the new master, as this is a user-requested failover. So the quorum wasn't used here.
 
 **Note**: also bear in mind that the failover took about 5 seconds, with minimal data to be synchronised:

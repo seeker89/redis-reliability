@@ -775,3 +775,22 @@ And finally, the third node, merely switching masters:
 │ 1:S 25 Apr 2025 20:50:14.059 * Master replication ID changed to 81f947776bb833b3608d5786844b3ab7cb37dd95                                                                                                                                            │
 │ 1:S 25 Apr 2025 20:50:14.059 * MASTER <-> REPLICA sync: Master accepted a Partial Resynchronization.   
 ```
+
+Bear in mind that the failover took about 5 seconds, with minimal data to be synchronised:
+
+```sh
+% redis-cli -u $URL_R INFO memory 
+# Memory
+used_memory:1770168
+used_memory_human:1.69M
+used_memory_rss:18042880
+used_memory_rss_human:17.21M
+used_memory_peak:2577096
+used_memory_peak_human:2.46M
+used_memory_peak_perc:68.69%
+used_memory_overhead:1405252
+used_memory_startup:979032
+used_memory_dataset:364916
+used_memory_dataset_perc:46.13%
+```
+

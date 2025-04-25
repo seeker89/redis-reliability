@@ -776,7 +776,35 @@ And finally, the third node, merely switching masters:
 │ 1:S 25 Apr 2025 20:50:14.059 * MASTER <-> REPLICA sync: Master accepted a Partial Resynchronization.   
 ```
 
-Bear in mind that the failover took about 5 seconds, with minimal data to be synchronised:
+The `sentinel` instance logged this:
+
+```sh
+│ 1:X 25 Apr 2025 20:50:12.889 * Executing user requested FAILOVER of 'mymaster'                                                                                                                                                                      │
+│ 1:X 25 Apr 2025 20:50:12.889 # +new-epoch 1                                                                                                                                                                                                         │
+│ 1:X 25 Apr 2025 20:50:12.889 # +try-failover master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379                                                                                                         │
+│ 1:X 25 Apr 2025 20:50:12.948 * Sentinel new configuration saved on disk                                                                                                                                                                             │
+│ 1:X 25 Apr 2025 20:50:12.948 # +vote-for-leader b460d64bf5a7297a9147de030fd36155499923a8 1                                                                                                                                                          │
+│ 1:X 25 Apr 2025 20:50:12.948 # +elected-leader master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379                                                                                                       │
+│ 1:X 25 Apr 2025 20:50:12.948 # +failover-state-select-slave master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379                                                                                          │
+│ 1:X 25 Apr 2025 20:50:13.040 # +selected-slave slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node- │
+│ 1:X 25 Apr 2025 20:50:13.040 * +failover-state-send-slaveof-noone slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster ex │
+│ 1:X 25 Apr 2025 20:50:13.113 * +failover-state-wait-promotion slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exerci │
+│ 1:X 25 Apr 2025 20:50:13.977 * Sentinel new configuration saved on disk                                                                                                                                                                             │
+│ 1:X 25 Apr 2025 20:50:13.978 # +promoted-slave slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node- │
+│ 1:X 25 Apr 2025 20:50:13.978 # +failover-state-reconf-slaves master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379                                                                                         │
+│ 1:X 25 Apr 2025 20:50:14.053 * +slave-reconf-sent slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-no │
+│ 1:X 25 Apr 2025 20:50:15.025 * +slave-reconf-inprog slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis- │
+│ 1:X 25 Apr 2025 20:50:15.025 * +slave-reconf-done slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-no │
+│ 1:X 25 Apr 2025 20:50:15.098 # +failover-end master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379                                                                                                         │
+│ 1:X 25 Apr 2025 20:50:15.098 # +switch-master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379                                │
+│ 1:X 25 Apr 2025 20:50:15.099 * +slave slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-1.exercis │
+│ 1:X 25 Apr 2025 20:50:15.099 * +slave slave exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-1.exercis │
+│ 1:X 25 Apr 2025 20:50:15.103 * Sentinel new configuration saved on disk
+```
+
+***Note***: there wasn't a real election for the new master, as this is a user-requested failover. So the quorum wasn't used here.
+
+**Note**: also bear in mind that the failover took about 5 seconds, with minimal data to be synchronised:
 
 ```sh
 % redis-cli -u $URL_R INFO memory 

@@ -37,7 +37,7 @@ This repo attemps two things:
   - [Step 4: write some data](#step-4-write-some-data)
   - [Step 6: programmatic access](#step-6-programmatic-access)
   - [Step 7: fly in the ointment (no strong consitency)](#step-7-fly-in-the-ointment-no-strong-consitency)
-  - [Step 8: Clean up](#step-8-clean-up)
+  - [Step 8: clean up](#step-8-clean-up)
 - [Exercise 1: failover in Sentinel mode](#exercise-1-failover-in-sentinel-mode)
   - [Step 0: deploy a version with Sentinel](#step-0-deploy-a-version-with-sentinel)
   - [Step 1: manual failover](#step-1-manual-failover)
@@ -535,7 +535,7 @@ Done: client_86 total_reads: 1000 stale_reads: 2 error_rate: 0.002
 100 clients all done
 ```
 
-## Step 8: Clean up 
+## Step 8: clean up 
 
 Let's wind everything down:
 

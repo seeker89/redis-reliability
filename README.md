@@ -36,7 +36,7 @@ This repo attemps two things:
   - [Step 3: validate our cluster](#step-3-validate-our-cluster)
   - [Step 4: write some data](#step-4-write-some-data)
   - [Step 6: programmatic access](#step-6-programmatic-access)
-  - [Step 7: fly in the ointment (no strong consitency)](#step-7-fly-in-the-ointment-no-strong-consitency)
+  - [Step 7: fly in the ointment (no strong consistency)](#step-7-fly-in-the-ointment-no-strong-consistency)
   - [Step 8: clean up](#step-8-clean-up)
 - [Exercise 1: failover in Sentinel mode](#exercise-1-failover-in-sentinel-mode)
   - [Step 0: deploy a version with Sentinel](#step-0-deploy-a-version-with-sentinel)
@@ -490,7 +490,7 @@ mystery: https://www.youtube.com/watch?v=dQw4w9WgXcQ
 Cool, so now we have everything we need to test out that consistency.
 
 
-## Step 7: fly in the ointment (no strong consitency)
+## Step 7: fly in the ointment (no strong consistency)
 
 Our little adventure so far might give you a false sense of security. Let's rain on that parade!
 

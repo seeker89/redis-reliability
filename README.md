@@ -496,7 +496,7 @@ Our little adventure so far might give you a false sense of security. Let's rain
 
 To show the stale reads from replicas, we're going to simulate 100 clients, each making a 1000 operations.
 
-We'll start `writer` goroutines which will write to a key, and corresponding `reader` goroutines that will read it as soon as the writer got acknoledgement, and compare the values.
+We'll start `writer` goroutines which will write to a key, and corresponding `reader` goroutines that will read it as soon as the writer got acknowledgement, and compare the values.
 
 My choice of Go to write the examples should now become clearer.
 

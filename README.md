@@ -37,6 +37,10 @@ This repo attemps two things:
   - [Step 4: write some data](#step-4-write-some-data)
   - [Step 6: programmatic access](#step-6-programmatic-access)
   - [Step 7: fly in the ointment (no strong consitency)](#step-7-fly-in-the-ointment-no-strong-consitency)
+  - [Step 8: Clean up](#step-8-clean-up)
+- [Exercise 1: failover in Sentinel mode](#exercise-1-failover-in-sentinel-mode)
+  - [Step 0: deploy a version with Sentinel](#step-0-deploy-a-version-with-sentinel)
+  - [Step 1: manual failover](#step-1-manual-failover)
 
 
 # Intro to Redis HA
@@ -114,9 +118,8 @@ With all of that in mind, the rest of the repo will show you how to validate you
 
 To do that, we'll do 3 exercises:
 
-1. manually failover `redis` in `replication` mode
-1. explore the `failover` process in `redis sentinel`
-2. explore the `failvoer` process in `redis cluster`
+0. demonstrate the lack of strong consistency in `master`-`replica` replication
+1. validate `failover` in `sentinel` mode (1 master lost)
 
 
 # Setup
@@ -267,18 +270,18 @@ Which should display something like this:
 
 ```sh
 |-----------|------------------------|-------------|--------------|
-| NAMESPACE |          NAME          | TARGET PORT |     URL      |
-|-----------|------------------------|-------------|--------------|
-| default   | exercise0-redis-master |             | No node port |
-|-----------|------------------------|-------------|--------------|
+| NAMESPACE   | NAME                     | TARGET PORT   | URL            |
+| ----------- | ------------------------ | ------------- | -------------- |
+| default     | exercise0-redis-master   |               | No node port   |
+| ----------- | ------------------------ | ------------- | -------------- |
 😿  service default/exercise0-redis-master has no node port
 ❗  Services [default/exercise0-redis-master] have type "ClusterIP" not meant to be exposed, however for local development minikube allows you to access this !
 🏃  Starting tunnel for service exercise0-redis-master.
 |-----------|------------------------|-------------|------------------------|
-| NAMESPACE |          NAME          | TARGET PORT |          URL           |
-|-----------|------------------------|-------------|------------------------|
-| default   | exercise0-redis-master |             | http://127.0.0.1:49801 |
-|-----------|------------------------|-------------|------------------------|
+| NAMESPACE   | NAME                     | TARGET PORT   | URL                      |
+| ----------- | ------------------------ | ------------- | ------------------------ |
+| default     | exercise0-redis-master   |               | http://127.0.0.1:49801   |
+| ----------- | ------------------------ | ------------- | ------------------------ |
 🎉  Opening service default/exercise0-redis-master in default browser...
 ❗  Because you are using a Docker driver on darwin, the terminal needs to be open to run it.
 ```
@@ -304,26 +307,26 @@ You should see something like this:
 
 ```sh
 |-----------|------------------------|-------------|--------------|
-| NAMESPACE |          NAME          | TARGET PORT |     URL      |
-|-----------|------------------------|-------------|--------------|
-| default   | exercise0-redis-master |             | No node port |
-|-----------|------------------------|-------------|--------------|
+| NAMESPACE   | NAME                     | TARGET PORT   | URL            |
+| ----------- | ------------------------ | ------------- | -------------- |
+| default     | exercise0-redis-master   |               | No node port   |
+| ----------- | ------------------------ | ------------- | -------------- |
 😿  service default/exercise0-redis-master has no node port
 |-----------|--------------------------|-------------|--------------|
-| NAMESPACE |           NAME           | TARGET PORT |     URL      |
-|-----------|--------------------------|-------------|--------------|
-| default   | exercise0-redis-replicas |             | No node port |
-|-----------|--------------------------|-------------|--------------|
+| NAMESPACE   | NAME                       | TARGET PORT   | URL            |
+| ----------- | -------------------------- | ------------- | -------------- |
+| default     | exercise0-redis-replicas   |               | No node port   |
+| ----------- | -------------------------- | ------------- | -------------- |
 😿  service default/exercise0-redis-replicas has no node port
 ❗  Services [default/exercise0-redis-master default/exercise0-redis-replicas] have type "ClusterIP" not meant to be exposed, however for local development minikube allows you to access this !
 🏃  Starting tunnel for service exercise0-redis-master.
 🏃  Starting tunnel for service exercise0-redis-replicas.
 |-----------|--------------------------|-------------|------------------------|
-| NAMESPACE |           NAME           | TARGET PORT |          URL           |
-|-----------|--------------------------|-------------|------------------------|
-| default   | exercise0-redis-master   |             | http://127.0.0.1:63057 |
-| default   | exercise0-redis-replicas |             | http://127.0.0.1:63059 |
-|-----------|--------------------------|-------------|------------------------|
+| NAMESPACE   | NAME                       | TARGET PORT   | URL                      |
+| ----------- | -------------------------- | ------------- | ------------------------ |
+| default     | exercise0-redis-master     |               | http://127.0.0.1:63057   |
+| default     | exercise0-redis-replicas   |               | http://127.0.0.1:63059   |
+| ----------- | -------------------------- | ------------- | ------------------------ |
 ...
 ```
 
@@ -532,3 +535,243 @@ Done: client_86 total_reads: 1000 stale_reads: 2 error_rate: 0.002
 100 clients all done
 ```
 
+## Step 8: Clean up 
+
+Let's wind everything down:
+
+```sh
+kubectl delete --recursive -f 0-yamls
+```
+
+And we can clean up the env vars we set:
+
+```sh
+unset URL_M
+unset URL_R
+```
+
+
+# Exercise 1: failover in Sentinel mode
+
+Let's now take a look at what the situation looks like when you throw in a `sentinel` into the mix.
+
+## Step 0: deploy a version with Sentinel
+
+I prepped a new file [1-sentinel.yaml](./1-sentinel.yaml) with a minimal config to give us a sentinel-enabled cluster.
+
+Let's see what it does:
+
+```sh
+helm template \
+  exercise1 \
+  charts/bitnami/redis \
+  -f 1-sentinel.yaml \
+  --namespace default \
+  --output-dir 1-yamls
+```
+
+Surprise - this time we actually get fewer things:
+
+```sh
+wrote 1-yamls/redis/templates/networkpolicy.yaml
+wrote 1-yamls/redis/templates/sentinel/pdb.yaml
+wrote 1-yamls/redis/templates/serviceaccount.yaml
+wrote 1-yamls/redis/templates/configmap.yaml
+wrote 1-yamls/redis/templates/health-configmap.yaml
+wrote 1-yamls/redis/templates/scripts-configmap.yaml
+wrote 1-yamls/redis/templates/headless-svc.yaml
+wrote 1-yamls/redis/templates/sentinel/service.yaml
+wrote 1-yamls/redis/templates/sentinel/statefulset.yaml
+```
+
+We only get one stateful set, and it contains two containers: one for redis, and one for the sentinel.
+
+Let's give it a whirl:
+
+```sh
+kubectl apply --recursive -f 1-yamls/
+```
+
+After a little while, we'll see our 3 replicas:
+
+```sh
+% kubectl get pods
+NAME                     READY   STATUS    RESTARTS   AGE
+exercise1-redis-node-0   2/2     Running   0          2m5s
+exercise1-redis-node-1   2/2     Running   0          91s
+exercise1-redis-node-2   2/2     Running   0          68s
+```
+
+**Note**: the 2/2 showing both the redis and sentinel containers.
+
+
+This time we don't get two services for writing and reading. Instead, we get a single service (in a regular and headless variant) with two ports: one for redis (for reading) and one for sentinel (for service discovery).
+
+```sh
+% kubectl get svc 
+NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)              AGE
+exercise1-redis            ClusterIP   10.100.110.77   <none>        6379/TCP,26379/TCP   3m36s
+exercise1-redis-headless   ClusterIP   None            <none>        6379/TCP,26379/TCP   3m36s
+kubernetes                 ClusterIP   10.96.0.1       <none>        443/TCP              3d5h
+```
+
+Once again, for those on `minikube`, expose the service:
+
+```sh
+minikube service exercise1-redis
+```
+
+For some reason it doesn't display the target port in the table, so we'll have to check which one is which:
+
+```sh
+...
+|-----------|-----------------|-------------|------------------------|
+| NAMESPACE   | NAME              | TARGET PORT   | URL                      |
+| ----------- | ----------------- | ------------- | ------------------------ |
+| default     | exercise1-redis   |               | http://127.0.0.1:63054   |
+|             |                   |               | http://127.0.0.1:63055   |
+| ----------- | ----------------- | ------------- | ------------------------ |
+...
+```
+
+They happen to be in the same order as yaml, so let's export these:
+
+```sh
+export URL_R=redis://127.0.0.1:63054
+export URL_S=redis://127.0.0.1:63055
+```
+
+Note, that `URL_R` now points to a random node, one of which is a currently a master. If you call the familiar `INFO replication` command on that URL a few times, you should hit all the nodes.
+
+This is what my `master` looks like:
+
+```sh
+% redis-cli -u $URL_R INFO replication
+# Replication
+role:master
+connected_slaves:2
+slave0:ip=exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local,port=6379,state=online,offset=975285,lag=1
+slave1:ip=exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local,port=6379,state=online,offset=975547,lag=0
+master_failover_state:no-failover
+master_replid:f520c2fee645b2e7a9966ac5b3d04ca53e15ea30
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:975547
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:975547
+```
+
+And this is a `replica`:
+
+```sh
+% redis-cli -u $URL_R INFO replication
+# Replication
+role:slave
+master_host:exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local
+master_port:6379
+master_link_status:up
+master_last_io_seconds_ago:0
+master_sync_in_progress:0
+slave_read_repl_offset:981849
+slave_repl_offset:981849
+slave_priority:100
+slave_read_only:1
+replica_announced:1
+connected_slaves:0
+master_failover_state:no-failover
+master_replid:f520c2fee645b2e7a9966ac5b3d04ca53e15ea30
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:981849
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:7687
+repl_backlog_histlen:974163
+```
+
+To get a definitive answer, we can call the `sentinel` and use the [`SENTINEL` command](https://cndoc.github.io/redis-doc-cn/cn/topics/sentinel.html#sentinel-api) to query for a master.
+
+It turns out to be the catchy `get-master-addr-by-name` subcommand:
+
+```sh
+% redis-cli -u $URL_S SENTINEL get-master-addr-by-name mymaster
+1) "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local"
+2) "6379"
+```
+
+## Step 1: manual failover
+
+Let's see what happens when we manually tell the sentinel to failover the master.
+
+```sh
+% redis-cli -u $URL_S SENTINEL failover mymaster
+OK
+```
+
+Easy peasy:
+
+```sh
+% redis-cli -u $URL_S SENTINEL get-master-addr-by-name mymaster
+1) "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local"
+2) "6379"
+```
+
+What does it look like on the old master? From the logs:
+
+```sh
+│ 1:M 25 Apr 2025 20:50:13.114 * Connection with replica exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 lost.                                                                                                         │
+│ 1:M 25 Apr 2025 20:50:14.056 * Connection with replica exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 lost.                                                                                                         │
+│ 1:S 25 Apr 2025 20:50:24.180 * Before turning into a replica, using my own master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.                                          │
+│ 1:S 25 Apr 2025 20:50:24.180 * Connecting to MASTER exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379                                                                                                                  │
+│ 1:S 25 Apr 2025 20:50:24.181 * MASTER <-> REPLICA sync started                                                                                                                                                                                      │
+│ 1:S 25 Apr 2025 20:50:24.181 * REPLICAOF exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 enabled (user request from 'id=5425 addr=10.244.0.8:55734 laddr=10.244.0.6:6379 fd=13 name=sentinel-b0fe4c03-cmd age=10 idl │
+│ 1:S 25 Apr 2025 20:50:24.181 * Non blocking connect for SYNC fired the event.                                                                                                                                                                       │
+│ 1:S 25 Apr 2025 20:50:24.181 * Master replied to PING, replication can continue...                                                                                                                                                                  │
+│ 1:S 25 Apr 2025 20:50:24.181 * Trying a partial resynchronization (request f520c2fee645b2e7a9966ac5b3d04ca53e15ea30:5226722).                                                                                                                       │
+│ 1:S 25 Apr 2025 20:50:29.065 * Full resync from master: 81f947776bb833b3608d5786844b3ab7cb37dd95:5229378                                                                                                                                            │
+│ 1:S 25 Apr 2025 20:50:29.071 * MASTER <-> REPLICA sync: receiving streamed RDB from master with EOF to disk                                                                                                                                         │
+│ 1:S 25 Apr 2025 20:50:29.072 * Discarding previously cached master state.                                                                                                                                                                           │
+│ 1:S 25 Apr 2025 20:50:29.072 * MASTER <-> REPLICA sync: Flushing old data                                                                                                                                                                           │
+│ 1:S 25 Apr 2025 20:50:29.073 * MASTER <-> REPLICA sync: Loading DB in memory 
+...
+```
+
+And this is what the new `master` has to say:
+
+```sh
+│ 1:M 25 Apr 2025 20:50:13.114 * Connection with master lost.                                                                                                                                                                                         │
+│ 1:M 25 Apr 2025 20:50:13.114 * Caching the disconnected master state.                                                                                                                                                                               │
+│ 1:M 25 Apr 2025 20:50:13.114 * Discarding previously cached master state.                                                                                                                                                                           │
+│ 1:M 25 Apr 2025 20:50:13.114 * Setting secondary replication ID to f520c2fee645b2e7a9966ac5b3d04ca53e15ea30, valid up to offset: 5223316. New replication ID is 81f947776bb833b3608d5786844b3ab7cb37dd95                                            │
+│ 1:M 25 Apr 2025 20:50:13.115 * MASTER MODE enabled (user request from 'id=3 addr=10.244.0.7:39464 laddr=10.244.0.7:6379 fd=14 name=sentinel-b460d64b-cmd age=13516 idle=0 flags=x db=0 sub=0 psub=0 ssub=0 multi=4 watch=0 qbuf=188 qbuf-free=20286 │
+│ 1:M 25 Apr 2025 20:50:14.059 * Replica exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 asks for synchronization                                                                                                      │
+│ 1:M 25 Apr 2025 20:50:14.059 * Partial resynchronization request from exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 accepted. Sending 285 bytes of backlog starting from offset 5223316.                           │
+│ 1:M 25 Apr 2025 20:50:24.182 * Replica exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local:6379 asks for synchronization                                                                                                      │
+│ 1:M 25 Apr 2025 20:50:24.182 * Partial resynchronization not accepted: Requested offset for second ID was 5226722, but I can reply up to 5223316                                                                                                    │
+│ 1:M 25 Apr 2025 20:50:24.182 * Delay next BGSAVE for diskless SYNC                                                                                                                                                                                  │
+│ 1:M 25 Apr 2025 20:50:29.065 * Starting BGSAVE for SYNC with target: replicas sockets                                                                                                                                                               │
+│ 1:M 25 Apr 2025 20:50:29.067 * Background RDB transfer started by pid 59081                                                                                                                                                                         │
+│ 59081:C 25 Apr 2025 20:50:29.070 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB                                                                                                                                                          │
+│ 1:M 25 Apr 2025 20:50:29.070 * Diskless rdb transfer, done reading from pipe, 1 replicas still up.                                                                                                                                                  │
+│ 1:M 25 Apr 2025 20:50:29.078 * Background RDB transfer terminated with success                                                                                                                                                                      │
+│ 1:M 25 Apr 2025 20:50:29.078 * Streamed RDB transfer with replica exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local:6379 succeeded (socket). Waiting for REPLCONF ACK from replica to enable streaming                      │
+│ 1:M 25 Apr 2025 20:50:29.078 * Synchronization with replica exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local:6379 succeeded
+```
+
+And finally, the third node, merely switching masters:
+
+```sh
+│ 1:M 25 Apr 2025 20:50:14.054 * Connection with master lost.                                                                                                                                                                                         │
+│ 1:M 25 Apr 2025 20:50:14.054 * Caching the disconnected master state.                                                                                                                                                                               │
+│ 1:S 25 Apr 2025 20:50:14.054 * Connecting to MASTER exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379                                                                                                                  │
+│ 1:S 25 Apr 2025 20:50:14.056 * MASTER <-> REPLICA sync started                                                                                                                                                                                      │
+│ 1:S 25 Apr 2025 20:50:14.056 * REPLICAOF exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 enabled (user request from 'id=9 addr=10.244.0.7:45106 laddr=10.244.0.8:6379 fd=12 name=sentinel-b460d64b-cmd age=13486 idl │
+│ 1:S 25 Apr 2025 20:50:14.057 * Non blocking connect for SYNC fired the event.                                                                                                                                                                       │
+│ 1:S 25 Apr 2025 20:50:14.058 * Master replied to PING, replication can continue...                                                                                                                                                                  │
+│ 1:S 25 Apr 2025 20:50:14.058 * Trying a partial resynchronization (request f520c2fee645b2e7a9966ac5b3d04ca53e15ea30:5223316).                                                                                                                       │
+│ 1:S 25 Apr 2025 20:50:14.059 * Successful partial resynchronization with master.                                                                                                                                                                    │
+│ 1:S 25 Apr 2025 20:50:14.059 * Master replication ID changed to 81f947776bb833b3608d5786844b3ab7cb37dd95                                                                                                                                            │
+│ 1:S 25 Apr 2025 20:50:14.059 * MASTER <-> REPLICA sync: Master accepted a Partial Resynchronization.   
+```

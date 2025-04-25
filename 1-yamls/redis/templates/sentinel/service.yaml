@@ -1,0 +1,30 @@
+---
+# Source: redis/templates/sentinel/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: exercise1-redis
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: exercise1
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 7.4.2
+    helm.sh/chart: redis-20.13.0
+    app.kubernetes.io/component: node
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: 6379
+      nodePort: null
+    - name: tcp-sentinel
+      port: 26379
+      targetPort: 26379
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: exercise1
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: node

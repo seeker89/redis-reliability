@@ -1,0 +1,19 @@
+architecture: replication
+sentinel:
+    enabled: true
+    # we can lose 1 sentinel and keep electing
+    quorum: 2
+    # we'll need to know the master set to ask
+    masterSet: mymaster
+    # let's be agressive - mark master failed after 5s
+    downAfterMilliseconds: 5000
+    # don't allow the master to exit cleanly
+    redisShutdownWaitFailover: false
+# minimal cluster
+master:
+    replicaCount: 1
+replica:
+    replicaCount: 3
+# very insecure
+auth:
+  enabled: false

@@ -81,6 +81,7 @@ In short, it adds a new set of `redis` instances, whose job is to detect a faile
 
 [Learn more here](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/).
 
+[And here](https://cndoc.github.io/redis-doc-cn/cn/topics/sentinel.html).
 
 ### Redis cluster
 

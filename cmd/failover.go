@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// failoverCmd represents the failover command
 var failoverCmd = &cobra.Command{
 	Use:   "failover",
 	Short: "Trigger redis failover",
@@ -17,5 +16,5 @@ var failoverCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(failoverCmd)
+	sentinelCmd.AddCommand(failoverCmd)
 }

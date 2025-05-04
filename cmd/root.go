@@ -3,17 +3,17 @@ package cmd
 import (
 	"os"
 
+	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
 	"github.com/spf13/cobra"
 )
+
+var cfg config.RRTConfig
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "redis-resiliency-toolkit",
 	Short: "Test the resiliency of your redis setup",
 	Long:  ``,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -26,13 +26,6 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.redis-resiliency-toolkit.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolVarP(&cfg.Verbose, "verbose", "v", false, "Make the output verbose")
+	rootCmd.PersistentFlags().StringVar(&cfg.Kubeconfig, "kube-config", "", "Path to a kubeconfig file. Leave empty for in-cluster")
 }

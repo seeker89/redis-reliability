@@ -8,7 +8,7 @@ import (
 
 var failoverCmd = &cobra.Command{
 	Use:   "failover",
-	Short: "Trigger redis failover",
+	Short: "Trigger soft redis failover",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("failover called")

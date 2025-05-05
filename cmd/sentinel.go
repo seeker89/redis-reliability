@@ -21,6 +21,6 @@ var sentinelCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(sentinelCmd)
-	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelURL, "sentinel", "", "Redis URL of the sentinel")
-	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelMaster, "master", "mymaster", "Redis master name (default: mymaster)")
+	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelURL, "sentinel", "redis://redis.default.svc.cluster.local:26379", "Redis URL of the sentinel")
+	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelMaster, "master", "mymaster", "Redis master name")
 }

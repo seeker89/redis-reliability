@@ -23,24 +23,31 @@ func NewPrinter(format string, pretty bool, out io.Writer) *Printer {
 	return &p
 }
 
-func (p *Printer) Print(data []map[string]string) {
+func (p *Printer) Print(data []map[string]string, headers []string) {
 	switch p.Format {
 	case "json":
 		p.PrintJSON(data)
 	default:
-		p.PrintText(data)
+		p.PrintText(data, headers)
 	}
 }
 
-func (p *Printer) PrintText(data []map[string]string) error {
-	w := tabwriter.NewWriter(p.Dest, 6, 4, 1, ' ', 0)
-	headers := []string{}
-	headersStr := ""
-	for k, _ := range data[0] {
-		headers = append(headers, k)
-		headersStr += k + "\t"
+func (p *Printer) PrintText(data []map[string]string, headers []string) error {
+	var flags uint
+	if p.Pretty {
+		flags = tabwriter.Debug
+	}
+	w := tabwriter.NewWriter(p.Dest, 6, 4, 1, ' ', flags)
+	if len(headers) == 0 || p.Format == "wide" {
+		for k, _ := range data[0] {
+			headers = append(headers, k)
+		}
 	}
 	if !p.SkipHeaders {
+		headersStr := ""
+		for _, k := range headers {
+			headersStr += k + "\t"
+		}
 		if _, err := fmt.Fprintln(w, headersStr); err != nil {
 			return err
 		}

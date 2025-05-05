@@ -44,6 +44,6 @@ func ExecuteSentinelStatus(
 			"host": res[0],
 			"port": res[1],
 		},
-	})
+	}, []string{})
 	return nil
 }

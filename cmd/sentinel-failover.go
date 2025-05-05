@@ -45,6 +45,7 @@ func ExecuteSentinelFailover(
 			fmt.Fprintln(os.Stderr, err)
 			return err
 		}
+		printer.Itemise = true
 		printer.Print([]map[string]string{
 			{
 				"result": res,

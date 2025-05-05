@@ -39,10 +39,10 @@ func ExecuteSentinelWatch(
 	defer pubsub.Close()
 	// just print all the messages, without headers
 	ch := pubsub.Channel()
-	prtr.SkipHeaders = true
-	prtr.Itemise = true
+	printer.SkipHeaders = true
+	printer.Itemise = true
 	for msg := range ch {
-		prtr.Print([]map[string]string{
+		printer.Print([]map[string]string{
 			{
 				"ch":  msg.Channel,
 				"msg": msg.Payload,

@@ -8,9 +8,10 @@ import (
 )
 
 type Printer struct {
-	Format string
-	Pretty bool
-	Dest   io.Writer
+	Format      string
+	Pretty      bool
+	SkipHeaders bool
+	Dest        io.Writer
 }
 
 func NewPrinter(format string, pretty bool, out io.Writer) *Printer {
@@ -39,8 +40,10 @@ func (p *Printer) PrintText(data []map[string]string) error {
 		headers = append(headers, k)
 		headersStr += k + "\t"
 	}
-	if _, err := fmt.Fprintln(w, headersStr); err != nil {
-		return err
+	if !p.SkipHeaders {
+		if _, err := fmt.Fprintln(w, headersStr); err != nil {
+			return err
+		}
 	}
 	for _, m := range data {
 		valuesStr := ""

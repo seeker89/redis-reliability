@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"time"
+
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/printer"
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/redisClient"
@@ -44,8 +46,9 @@ func ExecuteSentinelWatch(
 	for msg := range ch {
 		printer.Print([]map[string]string{
 			{
-				"ch":  msg.Channel,
-				"msg": msg.Payload,
+				"time": time.Now().String(),
+				"ch":   msg.Channel,
+				"msg":  msg.Payload,
 			},
 		}, []string{})
 	}

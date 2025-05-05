@@ -34,7 +34,7 @@ func init() {
 	// format options
 	rootCmd.PersistentFlags().BoolVarP(&cfg.Verbose, "verbose", "v", false, "Make the output verbose")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.Pretty, "pretty", "p", false, "Make the output pretty")
-	rootCmd.PersistentFlags().StringVar(&cfg.Format, "format", "json", "Output format (json, text)")
+	rootCmd.PersistentFlags().StringVarP(&cfg.Format, "output", "o", "json", "Output format (json, text, wide)")
 	// kubernetes options
 	rootCmd.PersistentFlags().StringVar(&cfg.Kubeconfig, "kube-config", "", "Path to a kubeconfig file. Leave empty for in-cluster")
 }

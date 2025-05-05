@@ -33,7 +33,10 @@ func ExecuteSentinelStatus(
 		return err
 	}
 	cmd := rdb.Do(ctx, "SENTINEL", "get-master-addr-by-name", redisConfig.SentinelMaster)
-	rdb.Process(ctx, cmd)
+	if err := rdb.Process(ctx, cmd); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
 	res, err := cmd.StringSlice()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/printer"
@@ -32,7 +35,10 @@ func ExecuteSentinelSentinels(
 	}
 	{
 		cmd := redis.NewMapStringStringSliceCmd(ctx, "SENTINEL", "sentinels", redisConfig.SentinelMaster)
-		rdb.Process(ctx, cmd)
+		if err := rdb.Process(ctx, cmd); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return err
+		}
 		res, _ := cmd.Result()
 		printer.Print(
 			res,

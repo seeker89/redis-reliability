@@ -11,6 +11,7 @@ type Printer struct {
 	Format      string
 	Pretty      bool
 	SkipHeaders bool
+	Itemise     bool
 	Dest        io.Writer
 }
 
@@ -26,7 +27,13 @@ func NewPrinter(format string, pretty bool, out io.Writer) *Printer {
 func (p *Printer) Print(data []map[string]string, headers []string) {
 	switch p.Format {
 	case "json":
-		p.PrintJSON(data)
+		if p.Itemise {
+			for _, v := range data {
+				p.PrintJSON(v)
+			}
+		} else {
+			p.PrintJSON(data)
+		}
 	default:
 		p.PrintText(data, headers)
 	}
@@ -66,7 +73,7 @@ func (p *Printer) PrintText(data []map[string]string, headers []string) error {
 	return nil
 }
 
-func (p *Printer) PrintJSON(data []map[string]string) error {
+func (p *Printer) PrintJSON(data any) error {
 	var b []byte
 	var err error
 	if p.Pretty {

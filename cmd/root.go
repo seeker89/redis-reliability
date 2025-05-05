@@ -4,16 +4,21 @@ import (
 	"os"
 
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
+	"github.com/seeker89/redis-resiliency-toolkit/pkg/printer"
 	"github.com/spf13/cobra"
 )
 
 var cfg config.RRTConfig
+var prtr *printer.Printer
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "redis-resiliency-toolkit",
 	Short: "Test the resiliency of your redis setup",
 	Long:  ``,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		prtr = printer.NewPrinter(cfg.Format, cfg.Pretty, os.Stdout)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -26,6 +31,10 @@ func Execute() {
 }
 
 func init() {
+	// format options
 	rootCmd.PersistentFlags().BoolVarP(&cfg.Verbose, "verbose", "v", false, "Make the output verbose")
+	rootCmd.PersistentFlags().BoolVarP(&cfg.Pretty, "pretty", "p", false, "Make the output pretty")
+	rootCmd.PersistentFlags().StringVar(&cfg.Format, "format", "json", "Output format (json, text)")
+	// kubernetes options
 	rootCmd.PersistentFlags().StringVar(&cfg.Kubeconfig, "kube-config", "", "Path to a kubeconfig file. Leave empty for in-cluster")
 }

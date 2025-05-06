@@ -40,6 +40,7 @@ func ExecuteSentinelMasters(
 			return err
 		}
 		res, _ := cmd.Result()
+		printer.Itemise = true
 		printer.Print(
 			[]map[string]string{res},
 			[]string{

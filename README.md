@@ -846,12 +846,10 @@ go run main.go \
 You will see something like this:
 
 ```sh
-[
-  {
-    "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
-    "port": "6379"
-  }
-]
+{
+  "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
+  "port": "6379"
+}
 ```
 
 Next, start a watch so that we can see everything that happens. Run this in one terminal session:
@@ -974,10 +972,8 @@ In the first terminal, you will see a bunch of events:
 And in the second one, you can check the new `master`:
 
 ```sh
-[
-  {
-    "host": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local",
-    "port": "6379"
-  }
-]
+{
+  "host": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local",
+  "port": "6379"
+}
 ```

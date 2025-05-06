@@ -42,6 +42,7 @@ func ExecuteSentinelStatus(
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
+	printer.Itemise = true
 	printer.Print([]map[string]string{
 		{
 			"host": res[0],

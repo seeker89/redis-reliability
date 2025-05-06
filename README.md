@@ -41,6 +41,7 @@ This repo attemps two things:
 - [Exercise 1: failover in Sentinel mode](#exercise-1-failover-in-sentinel-mode)
   - [Step 0: deploy a version with Sentinel](#step-0-deploy-a-version-with-sentinel)
   - [Step 1: manual failover](#step-1-manual-failover)
+  - [Step 2: classy failover](#step-2-classy-failover)
 
 
 # Intro to Redis HA
@@ -828,3 +829,155 @@ used_memory_dataset:364916
 used_memory_dataset_perc:46.13%
 ```
 
+## Step 2: classy failover
+
+Time to ascend into the higher realm.
+
+First, check the current master:
+
+```sh
+go run main.go \
+  -o json --pretty \
+  sentinel \
+  --sentinel $URL_S \
+  status
+```
+
+You will see something like this:
+
+```sh
+[
+  {
+    "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
+    "port": "6379"
+  }
+]
+```
+
+Next, start a watch so that we can see everything that happens. Run this in one terminal session:
+
+```sh
+go run main.go \
+  -o json --pretty \
+  sentinel \
+  --sentinel $URL_S \
+  watch "+*"
+```
+
+You won't see anything yet.
+
+Now, trigger a soft failover using the `sentinel failover` subcommand in a second terminal:
+
+```sh
+go run main.go \
+  -o json --pretty \
+  sentinel \
+  --sentinel $URL_S \
+  failover
+```
+
+In the first terminal, you will see a bunch of events:
+
+```sh
+{
+  "ch": "+new-epoch",
+  "msg": "19",
+  "time": "2025-05-06 01:06:45.490267 +0100 BST m=+7.552460126"
+}
+{
+  "ch": "+try-failover",
+  "msg": "master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:45.490588 +0100 BST m=+7.552781501"
+}
+{
+  "ch": "+vote-for-leader",
+  "msg": "0a1c2be9e2920281bb1de0d299e4acc9c11fea59 19",
+  "time": "2025-05-06 01:06:45.513966 +0100 BST m=+7.576159501"
+}
+{
+  "ch": "+elected-leader",
+  "msg": "master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:45.514018 +0100 BST m=+7.576211042"
+}
+{
+  "ch": "+failover-state-select-slave",
+  "msg": "master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:45.514031 +0100 BST m=+7.576224917"
+}
+{
+  "ch": "+selected-slave",
+  "msg": "slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:45.604762 +0100 BST m=+7.666955584"
+}
+{
+  "ch": "+failover-state-send-slaveof-noone",
+  "msg": "slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:45.6048 +0100 BST m=+7.666993251"
+}
+{
+  "ch": "+failover-state-wait-promotion",
+  "msg": "slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:45.708298 +0100 BST m=+7.770490876"
+}
+{
+  "ch": "+promoted-slave",
+  "msg": "slave exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:46.578152 +0100 BST m=+8.640342126"
+}
+{
+  "ch": "+failover-state-reconf-slaves",
+  "msg": "master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:46.578222 +0100 BST m=+8.640411334"
+}
+{
+  "ch": "+slave-reconf-sent",
+  "msg": "slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:46.638195 +0100 BST m=+8.700384667"
+}
+{
+  "ch": "+slave-reconf-inprog",
+  "msg": "slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:47.593048 +0100 BST m=+9.655234501"
+}
+{
+  "ch": "+slave-reconf-done",
+  "msg": "slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:51.715824 +0100 BST m=+13.777995626"
+}
+{
+  "ch": "+failover-end",
+  "msg": "master mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:51.797864 +0100 BST m=+13.860035084"
+}
+{
+  "ch": "+switch-master",
+  "msg": "mymaster exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379 exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:51.797919 +0100 BST m=+13.860090917"
+}
+{
+  "ch": "+slave",
+  "msg": "slave exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-2.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:51.797929 +0100 BST m=+13.860100376"
+}
+{
+  "ch": "+slave",
+  "msg": "slave exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379",
+  "time": "2025-05-06 01:06:51.797938 +0100 BST m=+13.860109542"
+}
+{
+  "ch": "+role-change",
+  "msg": "slave exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local:6379 exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379 @ mymaster exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local 6379 new reported role is slave",
+  "time": "2025-05-06 01:07:01.955581 +0100 BST m=+24.017717417"
+}
+```
+
+And in the second one, you can check the new `master`:
+
+```sh
+[
+  {
+    "host": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local",
+    "port": "6379"
+  }
+]
+```

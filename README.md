@@ -31,13 +31,13 @@ This repo attemps two things:
   - [`redis-cli`](#redis-cli)
   - [`k9s` (optional)](#k9s-optional)
 - [Exercise 0: replication mode](#exercise-0-replication-mode)
-  - [Step 1: prepare the yamls](#step-1-prepare-the-yamls)
-  - [Step 2: apply the yamls](#step-2-apply-the-yamls)
-  - [Step 3: validate our cluster](#step-3-validate-our-cluster)
-  - [Step 4: write some data](#step-4-write-some-data)
-  - [Step 6: programmatic access](#step-6-programmatic-access)
-  - [Step 7: fly in the ointment (no strong consistency)](#step-7-fly-in-the-ointment-no-strong-consistency)
-  - [Step 8: clean up](#step-8-clean-up)
+  - [Step 0: prepare the yamls](#step-0-prepare-the-yamls)
+  - [Step 1: apply the yamls](#step-1-apply-the-yamls)
+  - [Step 2: validate our cluster](#step-2-validate-our-cluster)
+  - [Step 3: write some data](#step-3-write-some-data)
+  - [Step 4: programmatic access](#step-4-programmatic-access)
+  - [Step 5: fly in the ointment (no strong consistency)](#step-5-fly-in-the-ointment-no-strong-consistency)
+  - [Step 6: clean up](#step-6-clean-up)
 - [Exercise 1: failover in Sentinel mode](#exercise-1-failover-in-sentinel-mode)
   - [Step 0: deploy a version with Sentinel](#step-0-deploy-a-version-with-sentinel)
   - [Step 1: manual failover](#step-1-manual-failover)
@@ -151,7 +151,7 @@ All the cool kids are running [`k9s`](https://k9scli.io/) these days. It can hel
 
 # Exercise 0: replication mode
 
-## Step 1: prepare the yamls
+## Step 0: prepare the yamls
 
 We're going to get the bitnami `helm` chart:
 
@@ -215,7 +215,7 @@ wrote 0-yamls/redis/templates/replicas/application.yaml
 Take a moment to take it all in. This is a "serious" `redis` deployment with a lot of bells and whistles. But at the base of it, it's just two `StatefulSet`s with all the glue that makes modern platform engineer secure in their job!
 
 
-## Step 2: apply the yamls
+## Step 1: apply the yamls
 
 On my `minikube` setup I'm testing this on, it's just:
 
@@ -297,7 +297,7 @@ PONG
 127.0.0.1:49801>
 ```
 
-## Step 3: validate our cluster
+## Step 2: validate our cluster
 
 For `minikube`rs, make sure that you can access both the `master` and `replicas` services:
 
@@ -432,7 +432,7 @@ repl_backlog_histlen:107913
 **Note**: we have two `replicas` behind that single service, so you're hitting one at a time.
 
 
-## Step 4: write some data
+## Step 3: write some data
 
 Now we're ready to see the data being replicated. How exciting!
 
@@ -470,7 +470,7 @@ And let's confirm that both the replicas and master have the data:
 
 Go on, click it. I know you want to.
 
-## Step 6: programmatic access
+## Step 4: programmatic access
 
 So the cli is all nice and good, but we're going to need something tad more automated.
 
@@ -492,7 +492,7 @@ mystery: https://www.youtube.com/watch?v=dQw4w9WgXcQ
 Cool, so now we have everything we need to test out that consistency.
 
 
-## Step 7: fly in the ointment (no strong consistency)
+## Step 5: fly in the ointment (no strong consistency)
 
 Our little adventure so far might give you a false sense of security. Let's rain on that parade!
 
@@ -537,7 +537,7 @@ Done: client_86 total_reads: 1000 stale_reads: 2 error_rate: 0.002
 100 clients all done
 ```
 
-## Step 8: clean up 
+## Step 6: clean up 
 
 Let's wind everything down:
 

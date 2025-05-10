@@ -8,8 +8,8 @@ You're probably using [redis](https://github.com/redis/redis). You probably don'
 
 This repo attemps two things:
 
-1 teach you about Redis failure scenarios
-2 provide a tool for implementing failure testing scenarios at home (Chaos Engineering)
+1. teach you about Redis failure scenarios
+2. provide a tool for implementing failure testing scenarios at home (Chaos Engineering)
 
 
 **Note**: I have no affiliation with Redis Ltd, I'm merely a concerned citizen seeing bad usage in the wild.

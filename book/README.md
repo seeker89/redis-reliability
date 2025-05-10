@@ -1,4 +1,4 @@
-# Redis resiliency toolkit
+# Redis resiliency
 
 Understand, validate & demonstrate Redis fault tolerance.
 
@@ -12,10 +12,8 @@ This repo attemps two things:
 * provide a tool for implementing failure testing scenarios at home (Chaos Engineering)
 
 
-**Note**: I have no affiliation with Redis Ltd, I'm merely a concerned citizen seeing bad usage in the wild.
-
 # Table of contents
-- [Redis resiliency toolkit](#redis-resiliency-toolkit)
+- [Redis resiliency](#redis-resiliency)
 - [TL;DR](#tldr)
 - [Table of contents](#table-of-contents)
 - [Intro to Redis HA](#intro-to-redis-ha)

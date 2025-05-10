@@ -9,6 +9,7 @@ run:
 	go run main.go version
 
 bin/$(bin): $(files)
+	time \
 	CGO_ENABLED=0 \
 	go build \
 		-ldflags "-extldflags=-static" \

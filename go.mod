@@ -9,4 +9,5 @@ require (
 	github.com/redis/go-redis/v9 v9.7.3 // indirect
 	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
+	k8s.io/client-go v0.33.0 // indirect
 )

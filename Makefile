@@ -1,5 +1,6 @@
 version ?= v0.0.1
 bin ?= rrt
+name ?= rrt
 tag = $(name):$(version)
 files = $(shell find . -iname "*.go")
 
@@ -10,6 +11,7 @@ run:
 bin/$(bin): $(files)
 	CGO_ENABLED=0 \
 	go build \
+		-ldflags "-extldflags=-static" \
 		-ldflags "-X 'main.Version=${version}' -X 'main.Build=`date`'" \
 		-o ./bin/${bin} \
 		main.go

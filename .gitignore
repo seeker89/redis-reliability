@@ -27,3 +27,6 @@ go.work.sum
 
 # ignore the charts repo we're going to clone in
 charts
+
+# binaries
+bin/

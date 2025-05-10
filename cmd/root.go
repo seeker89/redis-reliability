@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var Version, Build string
 var cfg config.RRTConfig
 var prtr *printer.Printer
 
@@ -23,7 +24,9 @@ var rootCmd = &cobra.Command{
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(version, build string) {
+	Version = version
+	Build = build
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)

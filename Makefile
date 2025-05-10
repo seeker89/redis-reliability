@@ -1,0 +1,24 @@
+version ?= v0.0.1
+bin ?= rrt
+tag = $(name):$(version)
+files = $(shell find . -iname "*.go")
+
+
+run:
+	go run main.go version
+
+bin/$(bin): $(files)
+	CGO_ENABLED=0 \
+	go build \
+		-ldflags "-X 'main.Version=${version}' -X 'main.Build=`date`'" \
+		-o ./bin/${bin} \
+		main.go
+
+clean:
+	rm -f ./bin/$(bin)
+
+build:
+	docker build -t $(namespace)$(tag) --target simple -f ./Dockerfile .
+
+
+.PHONY: run clean build

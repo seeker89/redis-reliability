@@ -32,12 +32,7 @@ func ExecuteSentinelStatus(
 	if err != nil {
 		return err
 	}
-	cmd := rdb.Do(ctx, "SENTINEL", "get-master-addr-by-name", redisConfig.SentinelMaster)
-	if err := rdb.Process(ctx, cmd); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return err
-	}
-	res, err := cmd.StringSlice()
+	master, err := redisClient.GetMasterFromSentinel(rdb, ctx, redisConfig.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err
@@ -45,8 +40,8 @@ func ExecuteSentinelStatus(
 	printer.Itemise = true
 	printer.Print([]map[string]string{
 		{
-			"host": res[0],
-			"port": res[1],
+			"host": master.Host,
+			"port": master.Port,
 		},
 	}, []string{})
 	return nil

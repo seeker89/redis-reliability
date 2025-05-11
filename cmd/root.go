@@ -14,8 +14,8 @@ var prtr *printer.Printer
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "redis-resiliency-toolkit",
-	Short: "Test the resiliency of your redis setup",
+	Use:   "rrt",
+	Short: "Verify resiliency of your redis setup",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		prtr = printer.NewPrinter(cfg.Format, cfg.Pretty, os.Stdout)

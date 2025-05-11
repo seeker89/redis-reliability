@@ -13,8 +13,7 @@ This repo attemps to:
 1. teach you `redis` failure scenarios
 2. give you a tool for implementing failure testing scenarios at home (Chaos Engineering)
 
-
-**Note**: I have no affiliation with Redis Ltd, I'm merely a concerned citizen seeing bad usage in the wild.
+**Note**: I have no affiliation with Redis Ltd
 
 # Table of contents
 - [Redis resiliency toolkit](#redis-resiliency-toolkit)

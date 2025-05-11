@@ -2,19 +2,9 @@
 
 Understand, validate & demonstrate Redis fault tolerance.
 
-# TL;DR
-
-You're probably using [redis](https://github.com/redis/redis). You probably don't fully understand its failure scenarios.
-
-This repo attemps two things:
-
-* teach you about Redis failure scenarios
-* provide a tool for implementing failure testing scenarios at home (Chaos Engineering)
-
 
 # Table of contents
 - [Redis resiliency](#redis-resiliency)
-- [TL;DR](#tldr)
 - [Table of contents](#table-of-contents)
 - [Intro to Redis HA](#intro-to-redis-ha)
   - [Redis availability](#redis-availability)

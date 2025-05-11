@@ -41,4 +41,5 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&cfg.Format, "output", "o", "json", "Output format (json, text, wide)")
 	// kubernetes options
 	rootCmd.PersistentFlags().StringVar(&cfg.Kubeconfig, "kubeconfig", os.Getenv("KUBECONFIG"), "Path to a kubeconfig file. Leave empty for in-cluster")
+	rootCmd.PersistentFlags().StringVar(&cfg.Kubeconfig, "namespace", os.Getenv(CMD_PREFIX+"NAMESPACE"), "Limit Kubernetes actions to only this namespace")
 }

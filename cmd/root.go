@@ -40,5 +40,5 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&cfg.Pretty, "pretty", "p", false, "Make the output pretty")
 	rootCmd.PersistentFlags().StringVarP(&cfg.Format, "output", "o", "json", "Output format (json, text, wide)")
 	// kubernetes options
-	rootCmd.PersistentFlags().StringVar(&cfg.Kubeconfig, "kube-config", "", "Path to a kubeconfig file. Leave empty for in-cluster")
+	rootCmd.PersistentFlags().StringVar(&cfg.Kubeconfig, "kubeconfig", os.Getenv("KUBECONFIG"), "Path to a kubeconfig file. Leave empty for in-cluster")
 }

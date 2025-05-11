@@ -29,7 +29,7 @@ func init() {
 
 func ExecuteSentinelWatch(
 	config *config.RRTConfig,
-	redisConfig *config.RedisConfig,
+	redisConfig *config.RedisSentinelConfig,
 	printer *printer.Printer,
 	pattern string,
 ) error {

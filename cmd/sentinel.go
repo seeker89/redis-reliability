@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var redisCfg config.RedisConfig
+var redisCfg config.RedisSentinelConfig
 var ctx = context.Background()
 
 var sentinelCmd = &cobra.Command{

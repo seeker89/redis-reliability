@@ -1,9 +1,6 @@
 package config
 
-import "github.com/redis/go-redis/v9"
-
-type RedisConfig struct {
+type RedisSentinelConfig struct {
 	SentinelURL    string
 	SentinelMaster string
-	RedisClient    *redis.Client
 }

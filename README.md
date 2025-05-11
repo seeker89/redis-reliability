@@ -79,7 +79,7 @@ For example:
 
 will print something like this:
 
-```sh
+```json
 {
   "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
   "port": "6379"
@@ -153,7 +153,7 @@ export RRT_SENTINEL_URL=redis://127.0.0.1:63055
 
 You will see something like this:
 
-```sh
+```json
 {
   "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
   "port": "6379"
@@ -179,7 +179,7 @@ Now, trigger a soft failover using the `sentinel failover` subcommand in a secon
 
 In the first terminal, you will see a bunch of events:
 
-```sh
+```json
 {
   "ch": "+new-epoch",
   "msg": "19",
@@ -214,7 +214,7 @@ In the first terminal, you will see a bunch of events:
 
 And in the second one, you can check the new `master` again:
 
-```sh
+```json
 {
   "host": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local",
   "port": "6379"

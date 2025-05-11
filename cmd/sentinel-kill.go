@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/printer"
@@ -28,11 +29,16 @@ func ExecuteSentinelKill(
 	redisConfig *config.RedisSentinelConfig,
 	printer *printer.Printer,
 ) error {
+	// we'll be emitting events one by one
+	printer.Itemise = true
+	printOne := func(data map[string]string) {
+		data["time"] = time.Now().String()
+		printer.Print([]map[string]string{data}, []string{"time", "event", "msg"})
+	}
 	rdb, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
 	if err != nil {
 		return err
-	}
-	// The plan here is:
+	} // The plan here is:
 	// 1. read the master from sentinel
 	// 2. query INFO from the master to see that it matches what sentinel gave us
 	//    by default, use the host:port from the sentinel
@@ -48,12 +54,9 @@ func ExecuteSentinelKill(
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
-	printer.Itemise = true
-	printer.Print([]map[string]string{
-		{
-			"host": master.Host,
-			"port": master.Port,
-		},
-	}, []string{})
+	printOne(map[string]string{
+		"event": "initial master",
+		"msg":   fmt.Sprintf("%s:%s", master.Host, master.Port),
+	})
 	return nil
 }

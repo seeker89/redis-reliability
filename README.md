@@ -4,12 +4,14 @@ Understand, validate & demonstrate Redis fault tolerance.
 
 # TL;DR
 
-You're probably using [redis](https://github.com/redis/redis). You probably don't fully understand its failure scenarios.
+You're probably using [`redis`](https://github.com/redis/redis).
 
-This repo attemps two things:
+You probably don't fully understand its failure scenarios.
 
-1. teach you about Redis failure scenarios
-2. provide a tool for implementing failure testing scenarios at home (Chaos Engineering)
+This repo attemps to:
+
+1. teach you `redis` failure scenarios
+2. give you a tool for implementing failure testing scenarios at home (Chaos Engineering)
 
 
 **Note**: I have no affiliation with Redis Ltd, I'm merely a concerned citizen seeing bad usage in the wild.
@@ -18,8 +20,8 @@ This repo attemps two things:
 - [Redis resiliency toolkit](#redis-resiliency-toolkit)
 - [TL;DR](#tldr)
 - [Table of contents](#table-of-contents)
-- [1. Learn about Redis HA](#1-learn-about-redis-ha)
-- [2. Use the `rrt` tool](#2-use-the-rrt-tool)
+- [1. Learn Redis HA](#1-learn-redis-ha)
+- [2. Use `rrt` for resiliency testing](#2-use-rrt-for-resiliency-testing)
   - [Building from sources](#building-from-sources)
   - [Building docker image](#building-docker-image)
   - [General usage](#general-usage)
@@ -29,11 +31,11 @@ This repo attemps two things:
     - [`sentinel failover`](#sentinel-failover)
 
 
-# 1. Learn about Redis HA
+# 1. Learn Redis HA
 
 Follow [the tutorial here](./book/) to a self-paced workshop on redis high availability.
 
-# 2. Use the `rrt` tool
+# 2. Use `rrt` for resiliency testing
 
 `rrt` is a command line utility designed to make testing `redis` super simple.
 

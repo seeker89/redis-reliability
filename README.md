@@ -19,7 +19,7 @@ This repo attemps two things:
 - [TL;DR](#tldr)
 - [Table of contents](#table-of-contents)
 - [1. Learn about Redis HA](#1-learn-about-redis-ha)
-- [2. Use the rtt chaos tool](#2-use-the-rtt-chaos-tool)
+- [2. Use the `rrt` tool](#2-use-the-rrt-tool)
   - [Building from sources](#building-from-sources)
   - [Building docker image](#building-docker-image)
   - [General usage](#general-usage)
@@ -33,8 +33,12 @@ This repo attemps two things:
 
 Read [the tutorial here](./book/)
 
-# 2. Use the rtt chaos tool
+# 2. Use the `rrt` tool
 
+`rrt` is a command line utility designed to make testing `redis` super simple.
+
+It can be used to observe the status of the cluster, plug into other tools & automation (it spits out JSON), and to implement automatic failure injection aka Chaos Engineering. I [like Chaos Engineering](https://www.manning.com/books/chaos-engineering).
+ 
 ## Building from sources
 
 ```sh

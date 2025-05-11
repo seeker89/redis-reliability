@@ -1,6 +1,8 @@
 package k8s
 
 import (
+	"strings"
+
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
@@ -27,4 +29,8 @@ func GetClient(kubeconfig string) (*kubernetes.Clientset, error) {
 		return nil, err
 	}
 	return clientset, nil
+}
+
+func GuessPodNameFromHost(hostname string) (string, error) {
+	return strings.Split(hostname, ".")[0], nil
 }

@@ -15,8 +15,8 @@ var sentinelSentinelsCmd = &cobra.Command{
 	Use:   "sentinels",
 	Short: "Show the sentinels for a master",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		ExecuteSentinelSentinels(&cfg, &redisCfg, prtr)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return ExecuteSentinelSentinels(&cfg, &redisCfg, prtr)
 	},
 }
 

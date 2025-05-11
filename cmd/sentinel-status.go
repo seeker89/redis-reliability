@@ -14,8 +14,8 @@ var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show the current master of the cluster",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		ExecuteSentinelStatus(&cfg, &redisCfg, prtr)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return ExecuteSentinelStatus(&cfg, &redisCfg, prtr)
 	},
 }
 

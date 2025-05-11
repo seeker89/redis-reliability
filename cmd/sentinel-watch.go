@@ -14,12 +14,12 @@ var sentinelWatchCmd = &cobra.Command{
 	Short: "Watch all events on the sentinel",
 	Long:  ``,
 	Args:  cobra.MaximumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		pattern := "*"
 		if len(args) == 1 {
 			pattern = args[0]
 		}
-		ExecuteSentinelWatch(&cfg, &redisCfg, prtr, pattern)
+		return ExecuteSentinelWatch(&cfg, &redisCfg, prtr, pattern)
 	},
 }
 

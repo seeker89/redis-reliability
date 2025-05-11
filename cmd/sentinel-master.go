@@ -15,8 +15,8 @@ var sentinelMasterCmd = &cobra.Command{
 	Use:   "master",
 	Short: "Show the details of the redis master",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		ExecuteSentinelMasters(&cfg, &redisCfg, prtr)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return ExecuteSentinelMasters(&cfg, &redisCfg, prtr)
 	},
 }
 

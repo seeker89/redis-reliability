@@ -35,28 +35,35 @@ func ExecuteSentinelKill(
 		data["time"] = time.Now().String()
 		printer.Print([]map[string]string{data}, []string{"time", "event", "msg"})
 	}
-	rdb, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
+	pq := make(chan map[string]string, 10)
+	go func() {
+		for {
+			printOne(<-pq)
+		}
+	}()
+	rdbs, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
 	if err != nil {
 		return err
-	} // The plan here is:
+	}
+	// The plan here is:
 	// 1. read the master from sentinel
 	// 2. query INFO from the master to see that it matches what sentinel gave us
 	//    by default, use the host:port from the sentinel
 	//    alternatively, use specified ingress/proxy
-	// 3. set up the event watcher & specified timeout
+	// 3. set up a sentinel event watcher & specified timeout
 	// 4. kill the pod containing current master
 	//    continue killing if the master switchover hasn't happened
 	// 6. wait for either 1) timeout, or 2) +switch-master event
 	// 7. read the master from sentinel again
 	// 8. query INFO from the master again
-	master, err := redisClient.GetMasterFromSentinel(rdb, ctx, redisConfig.SentinelMaster)
+	masterStart, err := redisClient.GetMasterFromSentinel(rdbs, ctx, redisConfig.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
-	printOne(map[string]string{
+	pq <- map[string]string{
 		"event": "initial master",
-		"msg":   fmt.Sprintf("%s:%s", master.Host, master.Port),
-	})
+		"msg":   fmt.Sprintf("%s:%s", masterStart.Host, masterStart.Port),
+	}
 	return nil
 }

@@ -22,6 +22,9 @@ This repo attemps two things:
 - [2. Use the rtt chaos tool](#2-use-the-rtt-chaos-tool)
   - [Building from sources](#building-from-sources)
   - [Building docker image](#building-docker-image)
+  - [General usage](#general-usage)
+    - [Subcommands](#subcommands)
+    - [Output format](#output-format)
 
 
 # 1. Learn about Redis HA
@@ -46,4 +49,53 @@ make bin/rrt
 ```sh
 make image
 ```
+
+## General usage
+
+### Subcommands
+
+`rrt` is split into subcommands:
+
+- `sentinel`
+- `kube`
+- `chaos`
+
+More details below.
+
+### Output format
+
+`rrt` can output text (`-o text`), more text (`-o wide`) or JSON (`-o json`), that can be optionally `--pretty`.
+
+For example:
+
+```sh
+./bin/rrt \
+  -o json --pretty \
+  sentinel --sentinel $URL_S \
+  status
+```
+
+will print something like this:
+
+```sh
+{
+  "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
+  "port": "6379"
+}
+```
+
+or like this if you skip the `--pretty` part:
+
+```json
+{"host":"exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local","port":"6379"}
+```
+
+or like this if you swap to `-o text`:
+
+```sh
+host                                                                      port  
+exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379
+```
+
+
 

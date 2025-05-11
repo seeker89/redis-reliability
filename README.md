@@ -31,7 +31,7 @@ This repo attemps two things:
 
 # 1. Learn about Redis HA
 
-Read [the tutorial here](./book/)
+Follow [the tutorial here](./book/) to a self-paced workshop on redis high availability.
 
 # 2. Use the `rrt` tool
 

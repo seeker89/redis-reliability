@@ -25,6 +25,7 @@ This repo attemps two things:
   - [General usage](#general-usage)
     - [Subcommands](#subcommands)
     - [Output format](#output-format)
+  - [`sentinel` subcommand](#sentinel-subcommand)
 
 
 # 1. Learn about Redis HA
@@ -97,5 +98,38 @@ host                                                                      port
 exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379
 ```
 
+## `sentinel` subcommand
 
+The sentinel command makes it easy to interact with `redis sentinel`:
+
+```sh
+ ./bin/rrt sentinel            
+Verify Redis sentinel setup
+
+Usage:
+  rrt sentinel [command]
+
+Available Commands:
+  failover    Trigger soft redis failover
+  master      Show the details of the redis master
+  replicas    Show the details of the replicas for a master
+  sentinels   Show the sentinels for a master
+  status      Show the current master of the cluster
+  watch       Watch all events on the sentinel
+
+Flags:
+  -h, --help              help for sentinel
+      --master string     Redis master name (default "mymaster")
+      --sentinel string   Redis URL of the sentinel. Use RRT_SENTINEL_URL (default "redis://127.0.0.1:63055")
+
+Global Flags:
+      --kube-config string   Path to a kubeconfig file. Leave empty for in-cluster
+  -o, --output string        Output format (json, text, wide) (default "json")
+  -p, --pretty               Make the output pretty
+  -v, --verbose              Make the output verbose
+
+Use "rrt sentinel [command] --help" for more information about a command.
+```
+
+You're going to need to specify the sentinel URL. You can use `--sentinel` flag or the `RRT_SENTINEL_URL` envvar.
 

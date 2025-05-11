@@ -11,6 +11,7 @@ import (
 var Version, Build string
 var cfg config.RRTConfig
 var prtr *printer.Printer
+var CMD_PREFIX = "RRT_"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{

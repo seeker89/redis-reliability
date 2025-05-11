@@ -21,6 +21,7 @@ This repo attemps two things:
 - [1. Learn about Redis HA](#1-learn-about-redis-ha)
 - [2. Use the rtt chaos tool](#2-use-the-rtt-chaos-tool)
   - [Building from sources](#building-from-sources)
+  - [Building docker image](#building-docker-image)
 
 
 # 1. Learn about Redis HA
@@ -39,3 +40,10 @@ make bin/rrt
 ./bin/rrt version
 {"build":"Sat May 10 14:01:13 BST 2025","version":"v0.0.1"}
 ```
+
+## Building docker image
+
+```sh
+make image
+```
+

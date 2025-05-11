@@ -20,6 +20,7 @@ This repo attemps two things:
 - [Table of contents](#table-of-contents)
 - [1. Learn about Redis HA](#1-learn-about-redis-ha)
 - [2. Use the rtt chaos tool](#2-use-the-rtt-chaos-tool)
+  - [Building from sources](#building-from-sources)
 
 
 # 1. Learn about Redis HA
@@ -28,4 +29,13 @@ Read [the tutorial here](./book/)
 
 # 2. Use the rtt chaos tool
 
-TODO
+## Building from sources
+
+```sh
+make bin/rrt
+```
+
+```sh
+./bin/rrt version
+{"build":"Sat May 10 14:01:13 BST 2025","version":"v0.0.1"}
+```

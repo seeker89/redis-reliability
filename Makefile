@@ -20,8 +20,8 @@ bin/$(bin): $(files)
 clean:
 	rm -f ./bin/$(bin)
 
-build:
+image:
 	docker build -t $(namespace)$(tag) --target simple -f ./Dockerfile .
 
 
-.PHONY: run clean build
+.PHONY: run clean image

@@ -45,7 +45,7 @@ func GuessPodNameFromHost(hostname string) (string, error) {
 	return strings.Split(hostname, ".")[0], nil
 }
 
-func KeepPodDead(ctx context.Context, clientset *kubernetes.Clientset, name, namespace string, done chan error, pq chan map[string]string) {
+func KeepPodDead(ctx context.Context, clientset *kubernetes.Clientset, name, namespace string, grace int64, done chan error, pq chan map[string]string) {
 	cl := clientset.CoreV1().Pods(namespace)
 	// check the pod exists
 	pod, err := cl.Get(ctx, name, metav1.GetOptions{})
@@ -63,7 +63,7 @@ func KeepPodDead(ctx context.Context, clientset *kubernetes.Clientset, name, nam
 			"name":      name,
 			"namespace": namespace,
 		}
-		err := cl.Delete(ctx, name, *metav1.NewDeleteOptions(0))
+		err := cl.Delete(ctx, name, *metav1.NewDeleteOptions(grace))
 		if errors.IsNotFound(err) {
 			pq <- map[string]string{
 				"event":     "pod not found",

@@ -103,7 +103,15 @@ func ExecuteSentinelKill(
 		"event": "pod name",
 		"msg":   n,
 	}
-	go k8s.KeepPodDead(ctx, k8sc, n, ns, done, pq)
+	go k8s.KeepPodDead(
+		ctx,
+		k8sc,
+		n,
+		ns,
+		int64(redisConfig.Grace.Seconds()),
+		done,
+		pq,
+	)
 
 	// 5. Setup the max time this all should take
 	go func(timeout time.Duration) {

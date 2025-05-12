@@ -32,4 +32,5 @@ func init() {
 	)
 	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelMaster, "master", master, "Redis master name")
 	sentinelCmd.PersistentFlags().DurationVarP(&redisCfg.Timeout, "timeout", "t", 60*time.Second, "Timeout for killing")
+	sentinelCmd.PersistentFlags().DurationVarP(&redisCfg.Grace, "grace", "g", 0*time.Second, "Grace period for killing")
 }

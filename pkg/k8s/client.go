@@ -92,6 +92,7 @@ func KeepPodDead(ctx context.Context, clientset *kubernetes.Clientset, name, nam
 		switch event.Type {
 		case watch.Added:
 			pq <- map[string]string{
+				"debug":     "true",
 				"event":     "pod event",
 				"type":      string(event.Type),
 				"name":      item.Name,

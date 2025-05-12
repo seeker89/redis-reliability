@@ -34,6 +34,10 @@ func ExecuteSentinelKill(
 	printer.SkipHeaders = true
 	printer.Itemise = true
 	printOne := func(data map[string]string) {
+		if data["debug"] != "" && !config.Verbose {
+			return
+		}
+		delete(data, "debug")
 		data["time"] = time.Now().String()
 		printer.Print([]map[string]string{data}, []string{"time", "event", "ch", "msg"})
 	}
@@ -80,7 +84,6 @@ func ExecuteSentinelKill(
 		done,
 		pq,
 		oldMaster,
-		cfg.Verbose,
 	)
 
 	// 4. Keep killing the pods without grace period
@@ -96,6 +99,7 @@ func ExecuteSentinelKill(
 		return err
 	}
 	pq <- map[string]string{
+		"debug": "true",
 		"event": "pod name",
 		"msg":   n,
 	}

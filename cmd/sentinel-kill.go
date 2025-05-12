@@ -53,12 +53,14 @@ func ExecuteSentinelKill(
 	// 2. query INFO from the master to see that it matches what sentinel gave us
 	//    by default, use the host:port from the sentinel
 	//    alternatively, use specified ingress/proxy
-	// 3. set up a sentinel event watcher & specified timeout
+	// 3. set up a sentinel event watcher
 	// 4. kill the pod containing current master
 	//    continue killing if the master switchover hasn't happened
-	// 6. wait for either 1) timeout, or 2) +switch-master event
+	// 5. setup the maximum timeout
 	// 7. read the master from sentinel again
 	// 8. query INFO from the master again
+
+	// 1. Read the old master from the sentinel
 	oldMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, redisConfig.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -68,6 +70,8 @@ func ExecuteSentinelKill(
 		"event": "initial master",
 		"msg":   fmt.Sprintf("%s:%s", oldMaster.Host, oldMaster.Port),
 	}
+
+	// 3. Listen to sentinel events, and finish early when possible
 	go redisClient.WaitForNewMaster(
 		ctx,
 		rdbs,
@@ -76,7 +80,8 @@ func ExecuteSentinelKill(
 		oldMaster,
 		cfg.Verbose,
 	)
-	// keep the pod dead until we succeed
+
+	// 4. Keep killing the pods without grace period
 	k8sc, err := k8s.GetClient(config.Kubeconfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -92,15 +97,30 @@ func ExecuteSentinelKill(
 		"msg":   n,
 	}
 	go k8s.KeepPodDead(ctx, k8sc, n, cfg.Namespace, done, pq)
-	// add a max timeout for all of this
-	go func() {
-		timeout := 60 * time.Second
+
+	// 5. Setup the max time this all should take
+	go func(timeout time.Duration) {
 		time.Sleep(timeout)
 		pq <- map[string]string{
 			"event":    "timeout",
 			"duration": timeout.String(),
 		}
 		done <- fmt.Errorf("timeout after %s", timeout)
-	}()
-	return <-done
+	}(redisCfg.Timeout)
+
+	// wait for the race to end
+	result := <-done
+
+	// 7. Read the master again from the sentinel
+	newMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, redisConfig.SentinelMaster)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
+	pq <- map[string]string{
+		"event": "final master",
+		"msg":   fmt.Sprintf("%s:%s", newMaster.Host, newMaster.Port),
+	}
+
+	return result
 }

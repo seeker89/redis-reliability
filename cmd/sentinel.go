@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
 	"github.com/spf13/cobra"
@@ -30,4 +31,5 @@ func init() {
 		"Redis URL of the sentinel. Use "+CMD_PREFIX+"SENTINEL_URL",
 	)
 	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelMaster, "master", master, "Redis master name")
+	sentinelCmd.PersistentFlags().DurationVarP(&redisCfg.Timeout, "timeout", "t", 60*time.Second, "Timeout for killing")
 }

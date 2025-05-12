@@ -5,4 +5,5 @@ type RRTConfig struct {
 	Pretty     bool
 	Format     string
 	Kubeconfig string
+	Namespace  string
 }

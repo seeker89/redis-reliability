@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
+	"github.com/seeker89/redis-resiliency-toolkit/pkg/k8s"
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/printer"
 	"github.com/seeker89/redis-resiliency-toolkit/pkg/redisClient"
 	"github.com/spf13/cobra"
@@ -73,7 +74,24 @@ func ExecuteSentinelKill(
 		done,
 		pq,
 		oldMaster,
+		cfg.Verbose,
 	)
+	// keep the pod dead until we succeed
+	k8sc, err := k8s.GetClient(config.Kubeconfig)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
+	n, err := k8s.GuessPodNameFromHost(oldMaster.Host)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
+	pq <- map[string]string{
+		"event": "pod name",
+		"msg":   n,
+	}
+	go k8s.KeepPodDead(k8sc, ctx, n, cfg.Namespace, done, pq)
 	// add a max timeout for all of this
 	go func() {
 		timeout := 60 * time.Second

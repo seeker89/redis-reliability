@@ -9,8 +9,9 @@ import (
 )
 
 type RedisInstance struct {
-	Host string
-	Port string
+	Host   string
+	Port   string
+	Master string
 }
 
 type RedisSwitchMasterEvent struct {
@@ -39,8 +40,9 @@ func GetMasterFromSentinel(rdb *redis.Client, ctx context.Context, master string
 		return nil, err
 	}
 	return &RedisInstance{
-		Host: res[0],
-		Port: res[1],
+		Host:   res[0],
+		Port:   res[1],
+		Master: master,
 	}, nil
 }
 
@@ -56,4 +58,63 @@ func ParseSwitchMasterMessage(msg string) (*RedisSwitchMasterEvent, error) {
 		NewMasterHost: parts[3],
 		NewMasterPort: parts[4],
 	}, nil
+}
+
+func WaitForNewMaster(
+	ctx context.Context,
+	rdbs *redis.Client,
+	done chan error,
+	pq chan map[string]string,
+	oldMaster *RedisInstance,
+) {
+	// listen in on new sentinel events
+	spubsub := rdbs.PSubscribe(ctx, "+*")
+	defer spubsub.Close()
+	for msg := range spubsub.Channel() {
+		switch msg.Channel {
+		case "+switch-master":
+			evt, err := ParseSwitchMasterMessage(msg.Payload)
+			if err != nil {
+				pq <- map[string]string{
+					"event": "bad message",
+					"msg":   err.Error(),
+				}
+				done <- err
+				continue
+			}
+			// ignore if the message for different master
+			if evt.Master != oldMaster.Master {
+				pq <- map[string]string{
+					"event":  "different master",
+					"master": evt.Master,
+				}
+				continue
+			}
+			// final check
+			if evt.OldMasterHost != oldMaster.Host || evt.OldMasterPort != oldMaster.Port {
+				done <- fmt.Errorf("previous master doesn't match; got %v, wanted %v", evt, oldMaster)
+				break
+			}
+			newMaster, err := GetMasterFromSentinel(rdbs, ctx, oldMaster.Master)
+			if err != nil {
+				done <- err
+				break
+			}
+			if evt.NewMasterHost != newMaster.Host || evt.NewMasterPort != newMaster.Port {
+				done <- fmt.Errorf("new master doesn't match; got %v, wanted %v", newMaster, evt)
+				break
+			}
+			pq <- map[string]string{
+				"event":      "done",
+				"result":     "OK",
+				"new_master": fmt.Sprintf("%s:%s", evt.NewMasterHost, evt.NewMasterPort),
+			}
+			done <- nil
+		}
+		pq <- map[string]string{
+			"event": "sentinel message",
+			"ch":    msg.Channel,
+			"msg":   msg.Payload,
+		}
+	}
 }

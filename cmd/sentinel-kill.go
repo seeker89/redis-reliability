@@ -67,58 +67,13 @@ func ExecuteSentinelKill(
 		"event": "initial master",
 		"msg":   fmt.Sprintf("%s:%s", oldMaster.Host, oldMaster.Port),
 	}
-	// listen in on new sentinel events
-	spubsub := rdbs.PSubscribe(ctx, "+*")
-	defer spubsub.Close()
-	go func() {
-		for msg := range spubsub.Channel() {
-			switch msg.Channel {
-			case "+switch-master":
-				evt, err := redisClient.ParseSwitchMasterMessage(msg.Payload)
-				if err != nil {
-					pq <- map[string]string{
-						"event": "bad message",
-						"msg":   err.Error(),
-					}
-					done <- err
-					continue
-				}
-				// ignore if the message for different master
-				if evt.Master != redisConfig.SentinelMaster {
-					pq <- map[string]string{
-						"event":  "different master",
-						"master": evt.Master,
-					}
-					continue
-				}
-				// final check
-				if evt.OldMasterHost != oldMaster.Host || evt.OldMasterPort != oldMaster.Port {
-					done <- fmt.Errorf("previous master doesn't match; got %v, wanted %v", evt, oldMaster)
-					break
-				}
-				newMaster, err := redisClient.GetMasterFromSentinel(rdbs, ctx, redisConfig.SentinelMaster)
-				if err != nil {
-					done <- err
-					break
-				}
-				if evt.NewMasterHost != newMaster.Host || evt.NewMasterPort != newMaster.Port {
-					done <- fmt.Errorf("new master doesn't match; got %v, wanted %v", newMaster, evt)
-					break
-				}
-				pq <- map[string]string{
-					"event":      "done",
-					"result":     "OK",
-					"new_master": fmt.Sprintf("%s:%s", evt.NewMasterHost, evt.NewMasterPort),
-				}
-				done <- nil
-			}
-			pq <- map[string]string{
-				"event": "sentinel message",
-				"ch":    msg.Channel,
-				"msg":   msg.Payload,
-			}
-		}
-	}()
+	go redisClient.WaitForNewMaster(
+		ctx,
+		rdbs,
+		done,
+		pq,
+		oldMaster,
+	)
 	// add a max timeout for all of this
 	go func() {
 		timeout := 60 * time.Second

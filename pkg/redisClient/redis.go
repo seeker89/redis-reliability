@@ -66,6 +66,7 @@ func WaitForNewMaster(
 	done chan error,
 	pq chan map[string]string,
 	oldMaster *RedisInstance,
+	verbose bool,
 ) {
 	// listen in on new sentinel events
 	spubsub := rdbs.PSubscribe(ctx, "+*")
@@ -110,11 +111,14 @@ func WaitForNewMaster(
 				"new_master": fmt.Sprintf("%s:%s", evt.NewMasterHost, evt.NewMasterPort),
 			}
 			done <- nil
-		}
-		pq <- map[string]string{
-			"event": "sentinel message",
-			"ch":    msg.Channel,
-			"msg":   msg.Payload,
+		default:
+			if verbose {
+				pq <- map[string]string{
+					"event": "sentinel",
+					"ch":    msg.Channel,
+					"msg":   msg.Payload,
+				}
+			}
 		}
 	}
 }

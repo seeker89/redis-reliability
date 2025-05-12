@@ -32,7 +32,7 @@ func ExecuteSentinelStatus(
 	if err != nil {
 		return err
 	}
-	master, err := redisClient.GetMasterFromSentinel(rdb, ctx, redisConfig.SentinelMaster)
+	master, err := redisClient.GetMasterFromSentinel(ctx, rdb, redisConfig.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err

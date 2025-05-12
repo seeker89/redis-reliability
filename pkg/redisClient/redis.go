@@ -30,7 +30,7 @@ func MakeRedisClient(url string) (*redis.Client, error) {
 	return redis.NewClient(opts), nil
 }
 
-func GetMasterFromSentinel(rdb *redis.Client, ctx context.Context, master string) (*RedisInstance, error) {
+func GetMasterFromSentinel(ctx context.Context, rdb *redis.Client, master string) (*RedisInstance, error) {
 	cmd := rdb.Do(ctx, "SENTINEL", "get-master-addr-by-name", master)
 	if err := rdb.Process(ctx, cmd); err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func WaitForNewMaster(
 				done <- fmt.Errorf("previous master doesn't match; got %v, wanted %v", evt, oldMaster)
 				break
 			}
-			newMaster, err := GetMasterFromSentinel(rdbs, ctx, oldMaster.Master)
+			newMaster, err := GetMasterFromSentinel(ctx, rdbs, oldMaster.Master)
 			if err != nil {
 				done <- err
 				break

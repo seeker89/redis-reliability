@@ -31,7 +31,7 @@ func GuessPodNameFromHost(hostname string) (string, error) {
 	return strings.Split(hostname, ".")[0], nil
 }
 
-func KeepPodDead(clientset *kubernetes.Clientset, ctx context.Context, name, namespace string, done chan error, pq chan map[string]string) {
+func KeepPodDead(ctx context.Context, clientset *kubernetes.Clientset, name, namespace string, done chan error, pq chan map[string]string) {
 	cl := clientset.CoreV1().Pods(namespace)
 	wf := func(ctx context.Context, options metav1.ListOptions) (watch.Interface, error) {
 		t := int64(60)

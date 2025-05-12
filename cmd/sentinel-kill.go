@@ -59,7 +59,7 @@ func ExecuteSentinelKill(
 	// 6. wait for either 1) timeout, or 2) +switch-master event
 	// 7. read the master from sentinel again
 	// 8. query INFO from the master again
-	oldMaster, err := redisClient.GetMasterFromSentinel(rdbs, ctx, redisConfig.SentinelMaster)
+	oldMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, redisConfig.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err
@@ -91,7 +91,7 @@ func ExecuteSentinelKill(
 		"event": "pod name",
 		"msg":   n,
 	}
-	go k8s.KeepPodDead(k8sc, ctx, n, cfg.Namespace, done, pq)
+	go k8s.KeepPodDead(ctx, k8sc, n, cfg.Namespace, done, pq)
 	// add a max timeout for all of this
 	go func() {
 		timeout := 60 * time.Second

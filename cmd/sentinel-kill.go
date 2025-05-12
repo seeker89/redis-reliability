@@ -43,11 +43,7 @@ func ExecuteSentinelKill(
 			printOne(<-pq)
 		}
 	}()
-	rdbs, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
-	if err != nil {
-		return err
-	}
-	done := make(chan error)
+
 	// The plan here is:
 	// 1. read the master from sentinel
 	// 2. query INFO from the master to see that it matches what sentinel gave us
@@ -59,6 +55,12 @@ func ExecuteSentinelKill(
 	// 5. setup the maximum timeout
 	// 7. read the master from sentinel again
 	// 8. query INFO from the master again
+
+	rdbs, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
+	if err != nil {
+		return err
+	}
+	done := make(chan error)
 
 	// 1. Read the old master from the sentinel
 	oldMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, redisConfig.SentinelMaster)
@@ -87,6 +89,7 @@ func ExecuteSentinelKill(
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
+	ns := k8s.DeriveNamespace(cfg.Namespace)
 	n, err := k8s.GuessPodNameFromHost(oldMaster.Host)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -96,7 +99,7 @@ func ExecuteSentinelKill(
 		"event": "pod name",
 		"msg":   n,
 	}
-	go k8s.KeepPodDead(ctx, k8sc, n, cfg.Namespace, done, pq)
+	go k8s.KeepPodDead(ctx, k8sc, n, ns, done, pq)
 
 	// 5. Setup the max time this all should take
 	go func(timeout time.Duration) {

@@ -103,11 +103,6 @@ func ExecuteSentinelKill(
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
-	pq <- map[string]string{
-		"debug": "true",
-		"event": "pod name",
-		"msg":   n,
-	}
 	go k8s.KeepPodDead(
 		ctx,
 		k8sc,

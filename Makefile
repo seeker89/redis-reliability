@@ -9,8 +9,8 @@ run:
 	go run main.go version
 
 bin/$(bin): $(files)
-	time \
 	CGO_ENABLED=0 \
+	time \
 	go build \
 		-ldflags "-extldflags=-static" \
 		-ldflags "-X 'main.Version=${version}' -X 'main.Build=`date`'" \

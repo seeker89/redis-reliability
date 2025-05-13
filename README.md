@@ -52,10 +52,10 @@ It can be used to observe the status of the cluster, plug into other tools & aut
 
 ## Running from docker hub
 
-Minimal images are published to [https://hub.docker.com/r/seeker89/redis-reliability](https://hub.docker.com/r/seeker89/redis-reliability) for `amd64` and `arm64`:
+Minimal images are published to [seeker89/redis-reliability](https://hub.docker.com/r/seeker89/redis-reliability) for `amd64` and `arm64`:
 
 ```sh
-docker run docker.io/seeker89/redis-reliability:v0.0.2
+docker run seeker89/redis-reliability:v0.0.2
 ```
  
 ## Building from sources

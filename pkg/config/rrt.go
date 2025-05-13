@@ -12,4 +12,7 @@ type RRTConfig struct {
 
 	Timeout time.Duration
 	Grace   time.Duration
+
+	SentinelURL    string
+	SentinelMaster string
 }

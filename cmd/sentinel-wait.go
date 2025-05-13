@@ -12,7 +12,7 @@ var sentinelWaitCmd = &cobra.Command{
 	Short: "Wait for the new master election",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return ExecuteSentinelWait(&cfg, &redisCfg, prtr)
+		return ExecuteSentinelWait(&cfg, prtr)
 	},
 }
 
@@ -22,10 +22,9 @@ func init() {
 
 func ExecuteSentinelWait(
 	config *config.RRTConfig,
-	redisConfig *config.RedisSentinelConfig,
 	printer *printer.Printer,
 ) error {
-	rdb, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
+	rdb, err := redisClient.MakeRedisClient(cfg.SentinelURL)
 	if err != nil {
 		return err
 	}

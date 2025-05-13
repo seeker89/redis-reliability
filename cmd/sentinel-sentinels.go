@@ -16,7 +16,7 @@ var sentinelSentinelsCmd = &cobra.Command{
 	Short: "Show the sentinels for a master",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return ExecuteSentinelSentinels(&cfg, &redisCfg, prtr)
+		return ExecuteSentinelSentinels(&cfg, prtr)
 	},
 }
 
@@ -26,15 +26,14 @@ func init() {
 
 func ExecuteSentinelSentinels(
 	config *config.RRTConfig,
-	redisConfig *config.RedisSentinelConfig,
 	printer *printer.Printer,
 ) error {
-	rdb, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
+	rdb, err := redisClient.MakeRedisClient(config.SentinelURL)
 	if err != nil {
 		return err
 	}
 	{
-		cmd := redis.NewMapStringStringSliceCmd(ctx, "SENTINEL", "sentinels", redisConfig.SentinelMaster)
+		cmd := redis.NewMapStringStringSliceCmd(ctx, "SENTINEL", "sentinels", config.SentinelMaster)
 		if err := rdb.Process(ctx, cmd); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return err

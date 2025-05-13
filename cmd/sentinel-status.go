@@ -15,7 +15,7 @@ var statusCmd = &cobra.Command{
 	Short: "Show the current master of the cluster",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return ExecuteSentinelStatus(&cfg, &redisCfg, prtr)
+		return ExecuteSentinelStatus(&cfg, prtr)
 	},
 }
 
@@ -25,14 +25,13 @@ func init() {
 
 func ExecuteSentinelStatus(
 	config *config.RRTConfig,
-	redisConfig *config.RedisSentinelConfig,
 	printer *printer.Printer,
 ) error {
-	rdb, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
+	rdb, err := redisClient.MakeRedisClient(cfg.SentinelURL)
 	if err != nil {
 		return err
 	}
-	master, err := redisClient.GetMasterFromSentinel(ctx, rdb, redisConfig.SentinelMaster)
+	master, err := redisClient.GetMasterFromSentinel(ctx, rdb, cfg.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err

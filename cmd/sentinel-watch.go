@@ -19,7 +19,7 @@ var sentinelWatchCmd = &cobra.Command{
 		if len(args) == 1 {
 			pattern = args[0]
 		}
-		return ExecuteSentinelWatch(&cfg, &redisCfg, prtr, pattern)
+		return ExecuteSentinelWatch(&cfg, prtr, pattern)
 	},
 }
 
@@ -29,11 +29,10 @@ func init() {
 
 func ExecuteSentinelWatch(
 	config *config.RRTConfig,
-	redisConfig *config.RedisSentinelConfig,
 	printer *printer.Printer,
 	pattern string,
 ) error {
-	rdb, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
+	rdb, err := redisClient.MakeRedisClient(cfg.SentinelURL)
 	if err != nil {
 		return err
 	}

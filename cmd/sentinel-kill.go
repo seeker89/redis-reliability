@@ -17,7 +17,7 @@ var sentinelKillCmd = &cobra.Command{
 	Short: "Kill the master to trigger failover",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return ExecuteSentinelKill(&cfg, &redisCfg, prtr)
+		return ExecuteSentinelKill(&cfg, prtr)
 	},
 }
 
@@ -27,7 +27,6 @@ func init() {
 
 func ExecuteSentinelKill(
 	config *config.RRTConfig,
-	redisConfig *config.RedisSentinelConfig,
 	printer *printer.Printer,
 ) error {
 	// we'll be emitting events one by one
@@ -63,14 +62,14 @@ func ExecuteSentinelKill(
 	// 7. read the master from sentinel again
 	// 8. query INFO from the master again
 
-	rdbs, err := redisClient.MakeRedisClient(redisConfig.SentinelURL)
+	rdbs, err := redisClient.MakeRedisClient(config.SentinelURL)
 	if err != nil {
 		return err
 	}
 	done := make(chan error)
 
 	// 1. Read the old master from the sentinel
-	oldMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, redisConfig.SentinelMaster)
+	oldMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, config.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err
@@ -125,7 +124,7 @@ func ExecuteSentinelKill(
 	result := <-done
 
 	// 7. Read the master again from the sentinel
-	newMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, redisConfig.SentinelMaster)
+	newMaster, err := redisClient.GetMasterFromSentinel(ctx, rdbs, config.SentinelMaster)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err

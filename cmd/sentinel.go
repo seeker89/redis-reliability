@@ -5,11 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/seeker89/redis-resiliency-toolkit/pkg/config"
 	"github.com/spf13/cobra"
 )
 
-var redisCfg config.RedisSentinelConfig
 var ctx = context.Background()
 
 var sentinelCmd = &cobra.Command{
@@ -25,12 +23,12 @@ func init() {
 		master = "mymaster"
 	}
 	sentinelCmd.PersistentFlags().StringVar(
-		&redisCfg.SentinelURL,
+		&cfg.SentinelURL,
 		"sentinel",
 		os.Getenv(CMD_PREFIX+"SENTINEL_URL"),
 		"Redis URL of the sentinel. Use "+CMD_PREFIX+"SENTINEL_URL",
 	)
-	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelMaster, "master", master, "Redis master name")
+	sentinelCmd.PersistentFlags().StringVar(&cfg.SentinelMaster, "master", master, "Redis master name")
 	sentinelCmd.PersistentFlags().DurationVarP(&cfg.Timeout, "timeout", "t", 60*time.Second, "Timeout for killing")
 	sentinelCmd.PersistentFlags().DurationVarP(&cfg.Grace, "grace", "g", 0*time.Second, "Grace period for killing")
 }

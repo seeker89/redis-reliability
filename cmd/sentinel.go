@@ -31,6 +31,6 @@ func init() {
 		"Redis URL of the sentinel. Use "+CMD_PREFIX+"SENTINEL_URL",
 	)
 	sentinelCmd.PersistentFlags().StringVar(&redisCfg.SentinelMaster, "master", master, "Redis master name")
-	sentinelCmd.PersistentFlags().DurationVarP(&redisCfg.Timeout, "timeout", "t", 60*time.Second, "Timeout for killing")
-	sentinelCmd.PersistentFlags().DurationVarP(&redisCfg.Grace, "grace", "g", 0*time.Second, "Grace period for killing")
+	sentinelCmd.PersistentFlags().DurationVarP(&cfg.Timeout, "timeout", "t", 60*time.Second, "Timeout for killing")
+	sentinelCmd.PersistentFlags().DurationVarP(&cfg.Grace, "grace", "g", 0*time.Second, "Grace period for killing")
 }

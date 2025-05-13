@@ -113,7 +113,7 @@ func ExecuteSentinelKill(
 		k8sc,
 		n,
 		ns,
-		int64(redisConfig.Grace.Seconds()),
+		int64(config.Grace.Seconds()),
 		done,
 		pq,
 	)
@@ -126,7 +126,7 @@ func ExecuteSentinelKill(
 			"duration": timeout.String(),
 		}
 		done <- fmt.Errorf("timeout after %s", timeout)
-	}(redisCfg.Timeout)
+	}(config.Timeout)
 
 	// wait for the race to end
 	result := <-done

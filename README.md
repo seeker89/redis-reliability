@@ -28,6 +28,8 @@ This repo attemps to:
     - [Output format](#output-format)
   - [`sentinel` subcommand](#sentinel-subcommand)
     - [`sentinel failover`](#sentinel-failover)
+    - [`sentinel kill`](#sentinel-kill)
+    - [`sentinel wait`](#sentinel-wait)
 
 
 # 1. Learn Redis HA
@@ -117,22 +119,27 @@ Usage:
 
 Available Commands:
   failover    Trigger soft redis failover
+  kill        Kill the master to trigger failover
   master      Show the details of the redis master
   replicas    Show the details of the replicas for a master
   sentinels   Show the sentinels for a master
   status      Show the current master of the cluster
+  wait        Wait for the new master election
   watch       Watch all events on the sentinel
 
 Flags:
-  -h, --help              help for sentinel
-      --master string     Redis master name (default "mymaster")
-      --sentinel string   Redis URL of the sentinel. Use RRT_SENTINEL_URL (default "redis://127.0.0.1:63055")
+  -g, --grace duration     Grace period for killing
+  -h, --help               help for sentinel
+      --master string      Redis master name (default "mymaster")
+      --sentinel string    Redis URL of the sentinel. Use RRT_SENTINEL_URL (default "redis://127.0.0.1:63055")
+  -t, --timeout duration   Timeout for killing (default 1m0s)
 
 Global Flags:
-      --kube-config string   Path to a kubeconfig file. Leave empty for in-cluster
-  -o, --output string        Output format (json, text, wide) (default "json")
-  -p, --pretty               Make the output pretty
-  -v, --verbose              Make the output verbose
+      --kubeconfig string   Path to a kubeconfig file. Leave empty for in-cluster. (KUBECONFIG)
+      --namespace string    Limit Kubernetes actions to only this namespace (NAMESPACE)
+  -o, --output string       Output format (json, text, wide) (default "json")
+  -p, --pretty              Make the output pretty
+  -v, --verbose             Make the output verbose
 
 Use "rrt sentinel [command] --help" for more information about a command.
 ```
@@ -226,3 +233,81 @@ And in the second one, you can check the new `master` again:
 }
 ```
 
+### `sentinel kill`
+
+A more drastic (and realistic) version of `sentinel failover`.
+
+It kills the pod returned by the sentinel until any of the following are true:
+* a new master is elected
+* a timeout has elapsed
+
+:warning: note, that the name of the pod to kill is expected to be stable (`statefulset`) and returned as the first part of the DNS name returned by the sentinel.
+
+You will need access to `kubernetes`, which you can set up by either:
+
+* populating `KUBECONFIG` or `--kubeconfig` with a path to valid `kubectl` config - for running out of the cluster
+* setting RBAC on the service account in use - for running in cluster
+
+With that, it's as simple as running `rrt sentinel kill`. For example:
+
+```sh
+./bin/rrt \
+  sentinel kill \
+  --pretty --kubeconfig ~/.kube/config --grace 1s --timeout 5m
+```
+
+Will give you something like this:
+
+```sh
+{
+  "event": "initial master",
+  "msg": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local:6379",
+  "time": "2025-05-13 01:26:25.061459 +0100 BST m=+0.049989542"
+}
+{
+  "event": "deleting pod",
+  "name": "exercise1-redis-node-0",
+  "namespace": "default",
+  "time": "2025-05-13 01:26:25.088399 +0100 BST m=+0.076929376"
+}
+{
+  "event": "deleting pod",
+  "name": "exercise1-redis-node-0",
+  "namespace": "default",
+  "time": "2025-05-13 01:26:25.093569 +0100 BST m=+0.082099959"
+}
+{
+  "event": "done",
+  "new_master": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379",
+  "result": "OK",
+  "time": "2025-05-13 01:26:26.366692 +0100 BST m=+1.355222876"
+}
+{
+  "done": "true",
+  "event": "final master",
+  "msg": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379",
+  "time": "2025-05-13 01:26:26.367382 +0100 BST m=+1.355912584"
+}
+```
+
+
+### `sentinel wait`
+
+Conversely, it's often handy to just wait until a new master is elected.
+
+You can do that easily, like so:
+
+```sh
+./bin/rrt sentinel wait --pretty                                            
+```
+
+It will just wait there until a master is elected, and then exit and print the diff:
+
+```json
+{
+  "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
+  "port": "6379",
+  "previous_host": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local",
+  "previous_port": "6379"
+}
+```

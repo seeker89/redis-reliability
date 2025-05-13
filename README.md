@@ -1,4 +1,4 @@
-# Redis resiliency toolkit
+# Redis reliability (`rr`)
 
 Understand, validate & demonstrate Redis fault tolerance.
 
@@ -11,12 +11,12 @@ You probably don't fully understand its failure scenarios.
 This repo attemps to:
 
 1. teach you `redis` failure scenarios
-2. give you a tool for implementing failure testing scenarios at home (Chaos Engineering)
+2. give you `rr` - a tool for implementing failure testing (Chaos Engineering)
 
 **Note**: I have no affiliation with Redis Ltd
 
 # Table of contents
-- [Redis resiliency toolkit](#redis-resiliency-toolkit)
+- [Redis reliability (`rr`)](#redis-reliability-rr)
 - [TL;DR](#tldr)
 - [Table of contents](#table-of-contents)
 - [1. Learn Redis HA](#1-learn-redis-ha)
@@ -35,7 +35,13 @@ This repo attemps to:
 
 # 1. Learn Redis HA
 
-Follow [the tutorial here](./book/) to a self-paced workshop on redis high availability.
+Start by following [the tutorial here](./book/) to a self-paced workshop on redis high availability:
+
+* replication vs sentinel vs cluster
+* HA setups
+* presistence options
+
+
 
 # 2. Use `rr` for resiliency testing
 
@@ -44,6 +50,8 @@ Follow [the tutorial here](./book/) to a self-paced workshop on redis high avail
 It can be used to observe the status of the cluster, plug into other tools & automation (it spits out JSON), and to implement automatic failure injection aka Chaos Engineering. I [like Chaos Engineering](https://www.manning.com/books/chaos-engineering).
  
 ## Building from sources
+
+`rr` is written in Go. [Setup Go](https://go.dev/doc/install), and then build your binary:
 
 ```sh
 make bin/rr

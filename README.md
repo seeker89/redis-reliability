@@ -20,7 +20,7 @@ This repo attemps to:
 - [TL;DR](#tldr)
 - [Table of contents](#table-of-contents)
 - [1. Learn Redis HA](#1-learn-redis-ha)
-- [2. Use `rrt` for resiliency testing](#2-use-rrt-for-resiliency-testing)
+- [2. Use `rr` for resiliency testing](#2-use-rr-for-resiliency-testing)
   - [Building from sources](#building-from-sources)
   - [Building docker image](#building-docker-image)
   - [General usage](#general-usage)
@@ -37,20 +37,20 @@ This repo attemps to:
 
 Follow [the tutorial here](./book/) to a self-paced workshop on redis high availability.
 
-# 2. Use `rrt` for resiliency testing
+# 2. Use `rr` for resiliency testing
 
-`rrt` is a command line utility designed to make testing `redis` super simple.
+`rr` is a command line utility designed to make testing `redis` super simple.
 
 It can be used to observe the status of the cluster, plug into other tools & automation (it spits out JSON), and to implement automatic failure injection aka Chaos Engineering. I [like Chaos Engineering](https://www.manning.com/books/chaos-engineering).
  
 ## Building from sources
 
 ```sh
-make bin/rrt
+make bin/rr
 ```
 
 ```sh
-./bin/rrt version
+./bin/rr version
 {"build":"Sat May 10 14:01:13 BST 2025","version":"v0.0.1"}
 ```
 
@@ -64,7 +64,7 @@ make image
 
 ### Subcommands
 
-`rrt` is split into subcommands:
+`rr` is split into subcommands:
 
 - `sentinel`
 - `kube`
@@ -74,12 +74,12 @@ More details below.
 
 ### Output format
 
-`rrt` can output text (`-o text`), more text (`-o wide`) or JSON (`-o json`), that can be optionally `--pretty`.
+`rr` can output text (`-o text`), more text (`-o wide`) or JSON (`-o json`), that can be optionally `--pretty`.
 
 For example:
 
 ```sh
-./bin/rrt \
+./bin/rr \
   -o json --pretty \
   sentinel --sentinel $URL_S \
   status
@@ -112,11 +112,11 @@ exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local 6379
 The sentinel command makes it easy to interact with `redis sentinel`:
 
 ```sh
- ./bin/rrt sentinel            
+ ./bin/rr sentinel            
 Verify Redis sentinel setup
 
 Usage:
-  rrt sentinel [command]
+  rr sentinel [command]
 
 Available Commands:
   failover    Trigger soft redis failover
@@ -142,7 +142,7 @@ Global Flags:
   -p, --pretty              Make the output pretty
   -v, --verbose             Make the output verbose
 
-Use "rrt sentinel [command] --help" for more information about a command.
+Use "rr sentinel [command] --help" for more information about a command.
 ```
 
 You're going to need to specify the sentinel URL. You can use `--sentinel` flag or the `RRT_SENTINEL_URL` envvar.
@@ -159,7 +159,7 @@ export RRT_SENTINEL_URL=redis://127.0.0.1:63055
 ```
 
 ```sh
-./bin/rrt \
+./bin/rr \
   -o json --pretty \
   sentinel status
 ```
@@ -176,7 +176,7 @@ You will see something like this:
 Next, start a watch so that we can see everything that happens. Run this in one terminal session:
 
 ```sh
-./bin/rrt \
+./bin/rr \
   -o json --pretty \
   sentinel watch
 ```
@@ -186,7 +186,7 @@ You won't see anything yet.
 Now, trigger a soft failover using the `sentinel failover` subcommand in a second terminal:
 
 ```sh
-./bin/rrt \
+./bin/rr \
   sentinel failover
 ```
 
@@ -249,10 +249,10 @@ You will need access to `kubernetes`, which you can set up by either:
 * populating `KUBECONFIG` or `--kubeconfig` with a path to valid `kubectl` config - for running out of the cluster
 * setting RBAC on the service account in use - for running in cluster
 
-With that, it's as simple as running `rrt sentinel kill`. For example:
+With that, it's as simple as running `rr sentinel kill`. For example:
 
 ```sh
-./bin/rrt \
+./bin/rr \
   sentinel kill \
   --pretty --kubeconfig ~/.kube/config --grace 1s --timeout 5m
 ```
@@ -300,7 +300,7 @@ kubectl get pods -w -n $YOUR_NAMESPACE
 And if you'd also like to see what the sentinel is doing, you can use either `redis-cli`, or `sentinel watch`. Try:
 
 ```sh
-./bin/rrt \
+./bin/rr \
   -o json --pretty \
   sentinel --sentinel $URL_S watch
 ```
@@ -312,7 +312,7 @@ And if you'd also like to see what the sentinel is doing, you can use either `re
 To read the current master, just do:
 
 ```sh
-./bin/rrt sentinel status --pretty -o json
+./bin/rr sentinel status --pretty -o json
 ```
 
 ```json
@@ -330,7 +330,7 @@ Conversely, it's often handy to just wait until a new master is elected.
 You can do that easily, like so:
 
 ```sh
-./bin/rrt sentinel wait --pretty                                            
+./bin/rr sentinel wait --pretty                                            
 ```
 
 It will just wait there until a master is elected, and then exit and print the diff:

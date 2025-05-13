@@ -11,13 +11,13 @@ RUN go mod download
 
 # Build binary
 COPY . ./
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make bin/rrt
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make bin/rr
 
-# Build the asset container, copy over rrt
+# Build the asset container, copy over rr
 FROM gcr.io/distroless/static:nonroot AS simple
-COPY --from=builder /w/bin/ /rrt
-ENTRYPOINT ["/rrt"]
+COPY --from=builder /w/bin/ /rr
+ENTRYPOINT ["/rr"]
 
 FROM $WINDOWS_BASE_IMAGE AS windows
-COPY --from=builder /w/bin/ /rrt.exe
-ENTRYPOINT ["/rrt.exe"]
+COPY --from=builder /w/bin/ /rr.exe
+ENTRYPOINT ["/rr.exe"]

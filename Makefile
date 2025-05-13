@@ -1,6 +1,6 @@
 version ?= v0.0.1
-bin ?= rrt
-name ?= rrt
+bin ?= rr
+name ?= rr
 tag = $(name):$(version)
 files = $(shell find . -iname "*.go")
 

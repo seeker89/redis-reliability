@@ -14,7 +14,7 @@ var prtr *printer.Printer
 var CMD_PREFIX = "RRT_"
 
 var rootCmd = &cobra.Command{
-	Use:   "rrt",
+	Use:   "rr",
 	Short: "Verify resiliency of your redis setup",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {

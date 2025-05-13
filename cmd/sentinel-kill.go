@@ -33,23 +33,21 @@ func ExecuteSentinelKill(
 	// we'll be emitting events one by one
 	printer.SkipHeaders = true
 	printer.Itemise = true
-	// we'll write here the message to print
+	// we'll write here the messages to print
 	pq := make(chan map[string]string, 10)
 	pqdone := make(chan bool)
-	printOne := func(data map[string]string) {
-		if data["debug"] != "" && !config.Verbose {
-			return
-		}
-		delete(data, "debug")
-		data["time"] = time.Now().String()
-		printer.Print([]map[string]string{data}, []string{"time", "event", "ch", "msg"})
-		if data["done"] == "true" {
-			pqdone <- true
-		}
-	}
 	go func() {
 		for {
-			printOne(<-pq)
+			data := <-pq
+			if data["debug"] != "" && !config.Verbose {
+				continue
+			}
+			delete(data, "debug")
+			data["time"] = time.Now().String()
+			printer.Print([]map[string]string{data}, []string{"time", "event", "ch", "msg"})
+			if data["done"] == "true" {
+				pqdone <- true
+			}
 		}
 	}()
 

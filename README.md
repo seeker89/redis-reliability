@@ -21,6 +21,7 @@ This repo attemps to:
 - [Table of contents](#table-of-contents)
 - [1. Learn Redis HA](#1-learn-redis-ha)
 - [2. Use `rr` for resiliency testing](#2-use-rr-for-resiliency-testing)
+  - [Running from docker hub](#running-from-docker-hub)
   - [Building from sources](#building-from-sources)
   - [Building docker image](#building-docker-image)
   - [General usage](#general-usage)
@@ -48,6 +49,14 @@ Start by following [the tutorial here](./book/) to a self-paced workshop on redi
 `rr` is a command line utility designed to make testing `redis` super simple.
 
 It can be used to observe the status of the cluster, plug into other tools & automation (it spits out JSON), and to implement automatic failure injection aka Chaos Engineering. I [like Chaos Engineering](https://www.manning.com/books/chaos-engineering).
+
+## Running from docker hub
+
+Minimal images are published to [https://hub.docker.com/r/seeker89/redis-reliability](https://hub.docker.com/r/seeker89/redis-reliability) for `amd64` and `arm64`:
+
+```sh
+docker run docker.io/seeker89/redis-reliability:v0.0.2
+```
  
 ## Building from sources
 

@@ -291,6 +291,21 @@ Will give you something like this:
 }
 ```
 
+You might also want to observe the pod being hammered like so:
+
+```sh
+kubectl get pods -w -n $YOUR_NAMESPACE
+```
+
+And if you'd also like to see what the sentinel is doing, you can use either `redis-cli`, or `sentinel watch`. Try:
+
+```sh
+./bin/rrt \
+  -o json --pretty \
+  sentinel --sentinel $URL_S watch
+```
+
+
 
 ### `sentinel status`
 

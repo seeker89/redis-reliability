@@ -27,7 +27,7 @@ func init() {
 }
 
 func ExecuteSentinelWatch(
-	config *config.RRTConfig,
+	config *config.RRConfig,
 	printer *printer.Printer,
 	pattern string,
 ) error {

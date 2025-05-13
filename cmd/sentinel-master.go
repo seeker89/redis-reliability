@@ -24,7 +24,7 @@ func init() {
 }
 
 func ExecuteSentinelMasters(
-	config *config.RRTConfig,
+	config *config.RRConfig,
 	printer *printer.Printer,
 ) error {
 	rdb, err := redisClient.MakeRedisClient(config.SentinelURL)

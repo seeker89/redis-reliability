@@ -2,7 +2,7 @@ package config
 
 import "time"
 
-type RRTConfig struct {
+type RRConfig struct {
 	Verbose bool
 	Pretty  bool
 	Format  string

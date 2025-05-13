@@ -20,7 +20,7 @@ func init() {
 }
 
 func ExecuteSentinelWait(
-	config *config.RRTConfig,
+	config *config.RRConfig,
 	printer *printer.Printer,
 ) error {
 	rdb, err := redisClient.MakeRedisClient(cfg.SentinelURL)

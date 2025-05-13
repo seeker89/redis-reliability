@@ -132,7 +132,7 @@ Flags:
   -g, --grace duration     Grace period for killing
   -h, --help               help for sentinel
       --master string      Redis master name (default "mymaster")
-      --sentinel string    Redis URL of the sentinel. Use RRT_SENTINEL_URL (default "redis://127.0.0.1:63055")
+      --sentinel string    Redis URL of the sentinel. Use RR_SENTINEL_URL (default "redis://127.0.0.1:63055")
   -t, --timeout duration   Timeout for killing (default 1m0s)
 
 Global Flags:
@@ -145,7 +145,7 @@ Global Flags:
 Use "rr sentinel [command] --help" for more information about a command.
 ```
 
-You're going to need to specify the sentinel URL. You can use `--sentinel` flag or the `RRT_SENTINEL_URL` envvar.
+You're going to need to specify the sentinel URL. You can use `--sentinel` flag or the `RR_SENTINEL_URL` envvar.
 
 
 ### `sentinel failover`
@@ -155,7 +155,7 @@ Triggers an immediate failover. This is a built-in feature of `redis`. It doesn'
 It goes something like this. First, check the current master:
 
 ```sh
-export RRT_SENTINEL_URL=redis://127.0.0.1:63055
+export RR_SENTINEL_URL=redis://127.0.0.1:63055
 ```
 
 ```sh

@@ -9,9 +9,9 @@ import (
 )
 
 var Version, Build string
-var cfg config.RRTConfig
+var cfg config.RRConfig
 var prtr *printer.Printer
-var CMD_PREFIX = "RRT_"
+var CMD_PREFIX = "RR_"
 
 var rootCmd = &cobra.Command{
 	Use:   "rr",

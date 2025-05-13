@@ -25,7 +25,7 @@ func init() {
 }
 
 func ExecuteSentinelKill(
-	config *config.RRTConfig,
+	config *config.RRConfig,
 	printer *printer.Printer,
 ) error {
 	// we'll be emitting events one by one

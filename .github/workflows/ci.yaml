@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - v*
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Compile the binary
+        run: |
+          make bin/rr
+          ./bin/rr
+
+      - name: Build the Docker image
+        run: |
+          make image 

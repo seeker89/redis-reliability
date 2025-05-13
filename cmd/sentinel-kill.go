@@ -44,7 +44,7 @@ func ExecuteSentinelKill(
 			}
 			delete(data, "debug")
 			data["time"] = time.Now().String()
-			printer.Print([]map[string]string{data}, []string{"time", "event", "ch", "msg"})
+			printer.Print([]map[string]string{data}, []string{"time", "event", "msg"})
 			if data["done"] == "true" {
 				pqdone <- true
 			}

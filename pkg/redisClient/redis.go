@@ -85,8 +85,8 @@ func WaitForNewMaster(
 			// ignore if the message for different master
 			if evt.Master != oldMaster.Master {
 				pq <- map[string]string{
-					"event":  "different master",
-					"master": evt.Master,
+					"event": "different master",
+					"msg":   evt.Master,
 				}
 				continue
 			}
@@ -105,9 +105,9 @@ func WaitForNewMaster(
 				break
 			}
 			pq <- map[string]string{
-				"event":      "done",
-				"result":     "OK",
-				"new_master": fmt.Sprintf("%s:%s", evt.NewMasterHost, evt.NewMasterPort),
+				"event":   "done",
+				"success": "true",
+				"msg":     fmt.Sprintf("%s:%s", evt.NewMasterHost, evt.NewMasterPort),
 			}
 			done <- nil
 		default:

@@ -14,7 +14,6 @@ import (
 var sentinelMasterCmd = &cobra.Command{
 	Use:   "master",
 	Short: "Show the details of the redis master",
-	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return ExecuteSentinelMasters(&cfg, prtr)
 	},

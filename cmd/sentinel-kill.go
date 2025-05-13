@@ -15,7 +15,6 @@ import (
 var sentinelKillCmd = &cobra.Command{
 	Use:   "kill",
 	Short: "Kill the master to trigger failover",
-	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return ExecuteSentinelKill(&cfg, prtr)
 	},

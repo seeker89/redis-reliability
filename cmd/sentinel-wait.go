@@ -10,7 +10,6 @@ import (
 var sentinelWaitCmd = &cobra.Command{
 	Use:   "wait",
 	Short: "Wait for the new master election",
-	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return ExecuteSentinelWait(&cfg, prtr)
 	},

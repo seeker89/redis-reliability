@@ -13,7 +13,6 @@ var ctx = context.Background()
 var sentinelCmd = &cobra.Command{
 	Use:   "sentinel",
 	Short: "Verify Redis sentinel setup",
-	Long:  ``,
 }
 
 func init() {

@@ -13,7 +13,6 @@ import (
 var sentinelFailoverCmd = &cobra.Command{
 	Use:   "failover",
 	Short: "Trigger soft redis failover",
-	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := ExecuteSentinelFailover(&cfg, prtr); err != nil {
 			return err

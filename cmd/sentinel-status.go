@@ -13,7 +13,6 @@ import (
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show the current master of the cluster",
-	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return ExecuteSentinelStatus(&cfg, prtr)
 	},

@@ -12,7 +12,6 @@ import (
 var sentinelWatchCmd = &cobra.Command{
 	Use:   "watch [pattern (default *)]",
 	Short: "Watch all events on the sentinel",
-	Long:  ``,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		pattern := "*"

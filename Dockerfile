@@ -1,6 +1,4 @@
-ARG WINDOWS_BASE_IMAGE=mcr.microsoft.com/windows/nanoserver:ltcs2022
-
-FROM --platform=$BUILDPLATFORM golang:1.24 AS builder
+FROM golang:1.24 AS builder
 ARG TARGETARCH
 ARG TARGETOS
 
@@ -17,7 +15,3 @@ RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make bin/rr
 FROM gcr.io/distroless/static:nonroot AS simple
 COPY --from=builder /w/bin/ /rr
 ENTRYPOINT ["/rr"]
-
-FROM $WINDOWS_BASE_IMAGE AS windows
-COPY --from=builder /w/bin/ /rr.exe
-ENTRYPOINT ["/rr.exe"]

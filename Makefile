@@ -1,7 +1,7 @@
 version ?= v0.0.1
 bin ?= rr
-name ?= rr
-namespace ?= seeker89
+name ?= redis-reliability
+namespace ?= seeker89/
 tag = $(name):$(version)
 files = $(shell find . -iname "*.go")
 

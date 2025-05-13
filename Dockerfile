@@ -13,5 +13,5 @@ RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make bin/rr
 
 # Build the asset container, copy over rr
 FROM gcr.io/distroless/static:nonroot AS simple
-COPY --from=builder /w/bin/ /rr
+COPY --from=builder /w/bin/rr /rr
 ENTRYPOINT ["/rr"]

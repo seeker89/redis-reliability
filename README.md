@@ -29,6 +29,7 @@ This repo attemps to:
   - [`sentinel` subcommand](#sentinel-subcommand)
     - [`sentinel failover`](#sentinel-failover)
     - [`sentinel kill`](#sentinel-kill)
+    - [`sentinel status`](#sentinel-status)
     - [`sentinel wait`](#sentinel-wait)
 
 
@@ -287,6 +288,22 @@ Will give you something like this:
   "event": "final master",
   "msg": "exercise1-redis-node-1.exercise1-redis-headless.default.svc.cluster.local:6379",
   "time": "2025-05-13 01:26:26.367382 +0100 BST m=+1.355912584"
+}
+```
+
+
+### `sentinel status`
+
+To read the current master, just do:
+
+```sh
+./bin/rrt sentinel status --pretty -o json
+```
+
+```json
+{
+  "host": "exercise1-redis-node-0.exercise1-redis-headless.default.svc.cluster.local",
+  "port": "6379"
 }
 ```
 

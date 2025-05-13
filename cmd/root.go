@@ -13,7 +13,6 @@ var cfg config.RRTConfig
 var prtr *printer.Printer
 var CMD_PREFIX = "RRT_"
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "rrt",
 	Short: "Verify resiliency of your redis setup",
@@ -21,6 +20,11 @@ var rootCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		prtr = printer.NewPrinter(cfg.Format, cfg.Pretty, os.Stdout)
 	},
+	// this is a rather annoying part of Cobra
+	// when using RunE, on any error, it will print the help output
+	// which is what you want when arguments validation fails, but not on actual runtim error
+	// so this disables
+	SilenceUsage: true,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
